@@ -11,7 +11,6 @@ vim.g.mapleader = " "
 
 vim.cmd('syntax enable');
 vim.cmd('filetype plugin indent on')
-vim.cmd('colorscheme habamax')
 
 require('core.options')
 
@@ -27,3 +26,4 @@ if not ok then
     print('Failed to load plugins')
 end
 
+vim.cmd('colorscheme tokyonight')

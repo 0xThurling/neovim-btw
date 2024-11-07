@@ -49,10 +49,10 @@ return {
 		end, { desc = "Open file 4" })
 
 		-- Toggle previous & next buffers stored within Harpoon list
-		vim.keymap.set("n", "<leader>hp", function()
+		vim.keymap.set("n", "<<", function()
 			harpoon:list():prev()
 		end, { desc = "Open previous file" })
-		vim.keymap.set("n", "<leader>hn", function()
+		vim.keymap.set("n", ">>", function()
 			harpoon:list():next()
 		end, { desc = "Open next file" })
 

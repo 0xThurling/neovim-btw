@@ -28,7 +28,7 @@ vim.keymap.set({ "n" }, "<leader>cc", function()
 end, { desc = "Opens Codeium Chat for the current buffer" })
 
 vim.keymap.set(
-	"n",
+	{ "n" },
 	"<leader>to",
 	open_floating_terminal,
 	{ noremap = true, silent = true, desc = "Open floating terminal" }
