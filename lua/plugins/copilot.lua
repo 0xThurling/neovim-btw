@@ -9,13 +9,6 @@ return {
 		build = "make tiktoken",
 		opts = {
 			debug = true,
-			window = {
-				layout = "float",
-				relative = "cursor",
-				width = 1,
-				height = 0.4,
-				row = 1,
-			},
 		},
 		config = function(_, opts)
 			local chat = require("CopilotChat")
