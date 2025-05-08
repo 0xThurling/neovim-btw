@@ -27,3 +27,4 @@ if not ok then
 end
 
 vim.cmd('colorscheme slate')
+

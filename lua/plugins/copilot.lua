@@ -1,56 +1,248 @@
+local IS_DEV = false
+
+local prompts = {
+  -- Code related prompts
+  Explain = "Please explain how the following code works.",
+  Review = "Please review the following code and provide suggestions for improvement.",
+  Tests = "Please explain how the selected code works, then generate unit tests for it.",
+  Refactor = "Please refactor the following code to improve its clarity and readability.",
+  FixCode = "Please fix the following code to make it work as intended.",
+  FixError = "Please explain the error in the following text and provide a solution.",
+  BetterNamings = "Please provide better names for the following variables and functions.",
+  Documentation = "Please provide documentation for the following code.",
+  SwaggerApiDocs = "Please provide documentation for the following API using Swagger.",
+  SwaggerJsDocs = "Please write JSDoc for the following API using Swagger.",
+  -- Text related prompts
+  Summarize = "Please summarize the following text.",
+  Spelling = "Please correct any grammar and spelling errors in the following text.",
+  Wording = "Please improve the grammar and wording of the following text.",
+  Concise = "Please rewrite the following text to make it more concise.",
+}
+
 return {
-	{
-		"CopilotC-Nvim/CopilotChat.nvim",
+  -- Setup copilot.vim
+  {
+    "github/copilot.vim",
+    version = "v1.42.0",
+    event = "VeryLazy",
+    config = function()
+      -- For copilot.vim
+      -- enable copilot for specific filetypes
+      vim.g.copilot_filetypes = {
+        ["TelescopePrompt"] = false,
+        ["*"] = false
+      }
+
+      -- Set to true to assume that copilot is already mapped
+      vim.g.copilot_assume_mapped = true
+      -- Set workspace folders
+      vim.g.copilot_workspace_folders = "~/Projects"
+
+      -- Setup keymaps
+      local keymap = vim.keymap.set
+      local opts = { silent = true }
+
+      -- Set <C-y> to accept copilot suggestion
+      keymap("i", "<C-y>", 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false })
+
+      -- Set <C-i> to accept line
+      keymap("i", "<C-i>", "<Plug>(copilot-accept-line)", opts)
+
+      -- Set <C-j> to next suggestion, <C-k> to previous suggestion, <C-l> to suggest
+      keymap("i", "<C-j>", "<Plug>(copilot-next)", opts)
+      keymap("i", "<C-k>", "<Plug>(copilot-previous)", opts)
+      keymap("i", "<C-l>", "<Plug>(copilot-suggest)", opts)
+
+      -- Set <C-d> to dismiss suggestion
+      keymap("i", "<C-d>", "<Plug>(copilot-dismiss)", opts)
+    end,
+  },
+  {
+    "folke/which-key.nvim",
+    optional = true,
+    opts = {
+      spec = {
+        { "<leader>a", group = "ai" },
+        { "<leader>gm", group = "Copilot Chat" },
+      },
+    },
+  },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    optional = true,
+    opts = {
+      file_types = { "markdown", "copilot-chat" },
+    },
+    ft = { "markdown", "copilot-chat" },
+  },
+  {
+    dir = IS_DEV and "~/Projects/research/CopilotChat.nvim" or nil,
+    "CopilotC-Nvim/CopilotChat.nvim",
     branch = "main",
-		dependencies = {
-			{ "zbirenbaum/copilot.lua" },
-			{ "nvim-lua/plenary.nvim" },
-      { "MeanderingProgrammer/render-markdown.nvim" }, -- Add this line
-		},
-		build = "make tiktoken",
-		opts = {
-			debug = true,
-		},
-		config = function(_, opts)
-			local chat = require("CopilotChat")
-			local select = require("CopilotChat.select")
+    -- version = "v3.3.0", -- Use a specific version to prevent breaking changes
+    dependencies = {
+      { "nvim-telescope/telescope.nvim" }, -- Use telescope for help actions
+      { "nvim-lua/plenary.nvim" },
+    },
+    opts = {
+      question_header = "## User ",
+      answer_header = "## Copilot ",
+      error_header = "## Error ",
+      prompts = prompts,
+      mappings = {
+        -- Use tab for completion
+        -- complete = {
+        --   detail = "Use @<Tab> or /<Tab> for options.",
+        --   insert = "<Tab>",
+        -- },
+        -- Close the chat
+        close = {
+          normal = "q",
+          insert = "<C-c>",
+        },
+        -- Reset the chat buffer
+        reset = {
+          normal = "<C-x>",
+          insert = "<C-x>",
+        },
+        -- Submit the prompt to Copilot
+        submit_prompt = {
+          normal = "<CR>",
+          insert = "<C-CR>",
+        },
+        -- Accept the diff
+        accept_diff = {
+          normal = "<C-y>",
+          insert = "<C-y>",
+        },
+        -- Show help
+        show_help = {
+          normal = "g?",
+        },
+      },
+    },
+    config = function(_, opts)
+      local chat = require("CopilotChat")
+      chat.setup(opts)
 
-			chat.setup(opts)
+      local select = require("CopilotChat.select")
+      vim.api.nvim_create_user_command("CopilotChatVisual", function(args)
+        chat.ask(args.args, { selection = select.visual })
+      end, { nargs = "*", range = true })
 
-			-- Create commands for visual and buffer modes
-			vim.api.nvim_create_user_command("CopilotChatVisual", function(args)
-				chat.ask(args.args, { selection = select.visual, popup=true })
-				vim.cmd("vertical resize -15")  -- Adjust the height of the window
-			end, { nargs = "*", range = true })
+      -- Inline chat with Copilot
+      vim.api.nvim_create_user_command("CopilotChatInline", function(args)
+        chat.ask(args.args, {
+          selection = select.visual,
+          window = {
+            layout = "float",
+            relative = "cursor",
+            width = 1,
+            height = 0.4,
+            row = 1,
+          },
+        })
+      end, { nargs = "*", range = true })
 
+      -- Restore CopilotChatBuffer
       vim.api.nvim_create_user_command("CopilotChatBuffer", function(args)
-				chat.ask(args.args, { selection = select.visual, popup=true })
-				vim.cmd("vertical resize -15")  -- Adjust the height of the window
-			end, { nargs = "*", range = true })
+        chat.ask(args.args, { selection = select.buffer })
+      end, { nargs = "*", range = true })
 
-			-- Keymaps
-			vim.keymap.set("n", "<leader>po", ":CopilotChatBuffer<CR>", { desc = "Open CopilotChat with buffer" })
-			vim.keymap.set("v", "<leader>po", ":CopilotChatVisual<CR>", { desc = "Open CopilotChat with selection" })
+      -- Custom buffer for CopilotChat
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "copilot-*",
+        callback = function()
+          vim.opt_local.relativenumber = true
+          vim.opt_local.number = true
 
-			vim.keymap.set("n", "<leader>pe", ":CopilotChatBuffer explain<CR>", { desc = "Explain buffer" })
-			vim.keymap.set("v", "<leader>pe", ":CopilotChatVisual explain<CR>", { desc = "Explain selection" })
-
-			vim.keymap.set("n", "<leader>pd", ":CopilotChatBuffer docs<CR>", { desc = "Document buffer" })
-			vim.keymap.set("v", "<leader>pd", ":CopilotChatVisual docs<CR>", { desc = "Document selection" })
-
-      -- Registers copilot-chat filetype for markdown rendering
-      require('render-markdown').setup({
-        file_types = { 'markdown', 'copilot-chat' },
+          -- Get current filetype and set it to markdown if the current filetype is copilot-chat
+          local ft = vim.bo.filetype
+          if ft == "copilot-chat" then
+            vim.bo.filetype = "markdown"
+          end
+        end,
       })
-
-      -- You might also want to disable default header highlighting 
-      -- for copilot chat when doing this and set error header style and separator
-      require('CopilotChat').setup({
-        highlight_headers = false,
-        separator = '---',
-        error_header = '> [!ERROR] Error',
-        -- rest of your config
-      })
-		end,
-	},
+    end,
+    event = "VeryLazy",
+    keys = {
+      -- Show prompts actions with telescope
+      {
+        "<leader>ap",
+        function()
+          require("CopilotChat").select_prompt({
+            context = {
+              "buffers",
+            },
+          })
+        end,
+        desc = "CopilotChat - Prompt actions",
+      },
+      {
+        "<leader>ap",
+        function()
+          require("CopilotChat").select_prompt()
+        end,
+        mode = "x",
+        desc = "CopilotChat - Prompt actions",
+      },
+      -- Code related commands
+      { "<leader>ae", "<cmd>CopilotChatExplain<cr>", desc = "CopilotChat - Explain code" },
+      { "<leader>at", "<cmd>CopilotChatTests<cr>", desc = "CopilotChat - Generate tests" },
+      { "<leader>ar", "<cmd>CopilotChatReview<cr>", desc = "CopilotChat - Review code" },
+      { "<leader>aR", "<cmd>CopilotChatRefactor<cr>", desc = "CopilotChat - Refactor code" },
+      { "<leader>an", "<cmd>CopilotChatBetterNamings<cr>", desc = "CopilotChat - Better Naming" },
+      -- Chat with Copilot in visual mode
+      {
+        "<leader>av",
+        ":CopilotChatVisual",
+        mode = "x",
+        desc = "CopilotChat - Open in vertical split",
+      },
+      {
+        "<leader>ax",
+        ":CopilotChatInline",
+        mode = "x",
+        desc = "CopilotChat - Inline chat",
+      },
+      -- Custom input for CopilotChat
+      {
+        "<leader>ai",
+        function()
+          local input = vim.fn.input("Ask Copilot: ")
+          if input ~= "" then
+            vim.cmd("CopilotChat " .. input)
+          end
+        end,
+        desc = "CopilotChat - Ask input",
+      },
+      -- Generate commit message based on the git diff
+      {
+        "<leader>am",
+        "<cmd>CopilotChatCommit<cr>",
+        desc = "CopilotChat - Generate commit message for all changes",
+      },
+      -- Quick chat with Copilot
+      {
+        "<leader>aq",
+        function()
+          local input = vim.fn.input("Quick Chat: ")
+          if input ~= "" then
+            vim.cmd("CopilotChatBuffer " .. input)
+          end
+        end,
+        desc = "CopilotChat - Quick chat",
+      },
+      -- Fix the issue with diagnostic
+      { "<leader>af", "<cmd>CopilotChatFixError<cr>", desc = "CopilotChat - Fix Diagnostic" },
+      -- Clear buffer and chat history
+      { "<leader>al", "<cmd>CopilotChatReset<cr>", desc = "CopilotChat - Clear buffer and chat history" },
+      -- Toggle Copilot Chat Vsplit
+      { "<leader>av", "<cmd>CopilotChatToggle<cr>", desc = "CopilotChat - Toggle" },
+      -- Copilot Chat Models
+      { "<leader>a?", "<cmd>CopilotChatModels<cr>", desc = "CopilotChat - Select Models" },
+      -- Copilot Chat Agents
+      { "<leader>aa", "<cmd>CopilotChatAgents<cr>", desc = "CopilotChat - Select Agents" },
+    },
+  },
 }

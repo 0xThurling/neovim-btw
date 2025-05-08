@@ -37,7 +37,8 @@ return {
 					"asm_lsp",
 					"angularls",
 					"bashls",
-          "svelte"
+          "svelte",
+          "cssls"
 				},
 				automatic_installation = true,
 			})
@@ -56,6 +57,12 @@ return {
 						},
 					},
 				},
+			})
+
+			-- CSS LSP
+			require("lspconfig").cssls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
 			})
 
 			-- Bash LSP
@@ -167,6 +174,7 @@ return {
 					"*.asm",
           "*.sh",
           "*.svelte",
+          "*.css",
 				},
 				callback = function(event)
 					local filetype = vim.bo[event.buf].filetype
@@ -201,6 +209,8 @@ return {
 						vim.cmd("LspStart bashls")
 					elseif filetype == "svelte" then
 						vim.cmd("LspStart svelte")
+					elseif filetype == "css" then
+						vim.cmd("LspStart cssls")
 					end
 				end,
 			})
