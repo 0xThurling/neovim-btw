@@ -1,0 +1,28 @@
+return {
+	{
+		"windwp/nvim-ts-autotag",
+		config = function()
+			require('nvim-ts-autotag').setup({
+				opts = {
+					enable_close = true, -- Auto close tags
+					enable_rename = true, -- Auto rename pairs of tags
+					enable_close_on_slash = false -- Auto close on trailing </
+				},
+				per_filetype = {
+					["html"] = {
+						enable_close = true
+					},
+          ["svelte"] = {
+            enable_close = true
+          }
+				}
+			})
+		end,
+	},
+	{
+		"olrtg/nvim-emmet",
+		config = function()
+			vim.keymap.set({ "n", "v" }, "<leader>xe", require("nvim-emmet").wrap_with_abbreviation)
+		end,
+	},
+}

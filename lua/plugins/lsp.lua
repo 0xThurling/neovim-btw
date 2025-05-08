@@ -19,16 +19,26 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
-		dependencies = {
-			"williamboman/mason.nvim",
-			"williamboman/mason-lspconfig.nvim",
-		},
 		config = function()
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "lua_ls", "ts_ls", "gopls", "html", "omnisharp", "clangd", "pyright" },
+				ensure_installed = {
+					"lua_ls",
+					"ts_ls",
+					"gopls",
+					"html",
+					"omnisharp",
+					"clangd",
+					"pyright",
+					"sqlls",
+					"rust_analyzer",
+					"asm_lsp",
+					"angularls",
+					"bashls",
+          "svelte"
+				},
 				automatic_installation = true,
 			})
 
@@ -46,6 +56,24 @@ return {
 						},
 					},
 				},
+			})
+
+			-- Bash LSP
+			require("lspconfig").bashls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+
+			-- Svelte LSP
+			require("lspconfig").svelte.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+
+			-- Angular Language Server
+			require("lspconfig").angularls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
 			})
 
 			-- Configure tsserver
@@ -77,6 +105,8 @@ return {
 			require("lspconfig").clangd.setup({
 				capabilities = capabilities,
 				on_attach = on_attach,
+				cmd = { "clangd", "--background-index" },
+				root_dir = require("lspconfig").util.root_pattern("compile_commands.json", ".clangd"),
 			})
 
 			-- Configure pyright for Python
@@ -85,9 +115,59 @@ return {
 				on_attach = on_attach,
 			})
 
+			-- Configure sqlls for SQL
+			require("lspconfig").sqlls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+
+			-- Configure ZIG lsp
+			require("lspconfig").zls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+
+			-- Add this configuration for rust_analyzer
+			require("lspconfig").rust_analyzer.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+
+			require("lspconfig").ols.setup({
+				init_options = {
+					checker_args = "-strict-style",
+					collections = {
+						{ name = "shared", path = vim.fn.expand("$HOME/odin") },
+					},
+				},
+			})
+
+			-- Add this configuration for asm_lsp
+			require("lspconfig").asm_lsp.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
+
 			-- Setup Lua LSP Server
 			vim.api.nvim_create_autocmd({ "BufEnter" }, {
-				pattern = { "*.lua", "*.ts", "*.tsx", "*.js", "*.jsx", "*.go", "*.html", "*.cs", "*.py", "*.c", "*.h", "*.cpp"},
+				pattern = {
+					"*.lua",
+					"*.ts",
+					"*.tsx",
+					"*.js",
+					"*.jsx",
+					"*.go",
+					"*.html",
+					"*.cs",
+					"*.py",
+					"*.c",
+					"*.h",
+					"*.cpp",
+					"*.rs",
+					"*.asm",
+          "*.sh",
+          "*.svelte",
+				},
 				callback = function(event)
 					local filetype = vim.bo[event.buf].filetype
 					if filetype == "lua" then
@@ -103,12 +183,24 @@ return {
 						vim.cmd("LspStart gopls")
 					elseif filetype == "html" then
 						vim.cmd("LspStart html")
-          elseif filetype == "cs" then
-            vim.cmd("LspStart omnisharp")
+					elseif filetype == "cs" then
+						vim.cmd("LspStart omnisharp")
 					elseif filetype == "cpp" or filetype == "c" then
 						vim.cmd("LspStart clangd")
 					elseif filetype == "python" then
-						vim.cmd("LspStart pyright")
+						vim.cmd("LspStart pylsp")
+					elseif filetype == "sql" then
+						vim.cmd("LspStart sqlls")
+					elseif filetype == "odin" then
+						vim.cmd("LspStart ols")
+					elseif filetype == "rust" then
+						vim.cmd("LspStart rust_analyzer")
+					elseif filetype == "asm" then
+						vim.cmd("LspStart asm_lsp")
+					elseif filetype == "sh" then
+						vim.cmd("LspStart bashls")
+					elseif filetype == "svelte" then
+						vim.cmd("LspStart svelte")
 					end
 				end,
 			})

@@ -26,4 +26,4 @@ if not ok then
     print('Failed to load plugins')
 end
 
-vim.cmd('colorscheme tokyonight')
+vim.cmd('colorscheme slate')

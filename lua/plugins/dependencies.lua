@@ -1,14 +1,14 @@
 return {
+  {
+    { "mason-org/mason.nvim", branch = "v1.x" },
+    { "mason-org/mason-lspconfig.nvim", branch = "v1.x" },
+  },
 	{
 		"nvim-tree/nvim-web-devicons",
 		lazy = true,
 	},
 	{
 		"neovim/nvim-lspconfig",
-		dependencies = {
-			{ "williamboman/mason.nvim", config = true },
-			"williamboman/mason-lspconfig.nvim",
-		},
 	},
 	{
 		"hrsh7th/nvim-cmp",

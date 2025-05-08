@@ -49,12 +49,12 @@ return {
 		end, { desc = "Open file 4" })
 
 		-- Toggle previous & next buffers stored within Harpoon list
-		vim.keymap.set("n", "<<", function()
+		vim.keymap.set("n", "<leader>h<", function()
 			harpoon:list():prev()
 		end, { desc = "Open previous file" })
-		vim.keymap.set("n", ">>", function()
+		vim.keymap.set("n", "<leader>h>", function()
 			harpoon:list():next()
-		end, { desc = "Open next file" })
+    end, { desc = "Open next file" })
 
 		-- basic telescope configuration
 		local conf = require("telescope.config").values
