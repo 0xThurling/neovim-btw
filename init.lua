@@ -26,5 +26,5 @@ if not ok then
     print('Failed to load plugins')
 end
 
-vim.cmd('colorscheme slate')
+vim.cmd('colorscheme gruvbox')
 
