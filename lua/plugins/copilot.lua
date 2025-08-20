@@ -19,6 +19,29 @@ local prompts = {
   Concise = "Please rewrite the following text to make it more concise.",
 }
 
+local function open_gemini_terminal()
+  vim.cmd("vsplit") -- Create a new vertical split
+  local new_win_id = vim.api.nvim_get_current_win() -- Get the ID of the newly created window
+
+  -- Move the new window to the right
+  vim.cmd("wincmd L")
+
+  local bufnr = vim.api.nvim_create_buf(false, true) -- Create a new buffer for the terminal
+  vim.api.nvim_win_set_buf(new_win_id, bufnr) -- Set the new buffer to the new window
+
+  local job_id = vim.fn.termopen("gemini", {
+    on_exit = function()
+      -- Check if the buffer still exists before deleting
+      if vim.api.nvim_buf_is_valid(bufnr) then
+        vim.api.nvim_buf_delete(bufnr, { force = true })
+      end
+    end,
+  })
+
+  vim.api.nvim_set_current_win(new_win_id) -- Make the new window the current one
+  vim.cmd("startinsert")
+end
+
 return {
   -- Setup copilot.vim
   {
@@ -63,7 +86,6 @@ return {
     opts = {
       spec = {
         { "<leader>a", group = "ai" },
-        { "<leader>gm", group = "Copilot Chat" },
       },
     },
   },
@@ -88,6 +110,7 @@ return {
       question_header = "## User ",
       answer_header = "## Copilot ",
       error_header = "## Error ",
+      model = "gpt-4.1",
       prompts = prompts,
       mappings = {
         -- Use tab for completion
@@ -205,16 +228,13 @@ return {
         mode = "x",
         desc = "CopilotChat - Inline chat",
       },
-      -- Custom input for CopilotChat
+      -- Custom input for Gemini
       {
-        "<leader>ai",
+        "<Tab>g",
         function()
-          local input = vim.fn.input("Ask Copilot: ")
-          if input ~= "" then
-            vim.cmd("CopilotChat " .. input)
-          end
+          open_gemini_terminal()
         end,
-        desc = "CopilotChat - Ask input",
+        desc = "Gemini - Ask input",
       },
       -- Generate commit message based on the git diff
       {

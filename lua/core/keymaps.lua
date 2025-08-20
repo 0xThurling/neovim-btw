@@ -8,7 +8,6 @@ local function open_floating_terminal()
 		height = height,
 		col = math.floor((vim.o.columns - width) / 2),
 		row = math.floor((vim.o.lines - height) / 2),
-		style = "minimal",
 		border = "rounded",
 	})
 	vim.fn.termopen(vim.o.shell)
@@ -42,12 +41,6 @@ vim.keymap.set("n", "<Tab>s", ":vsplit<CR>", {
 	desc = "Split current buffer vertically", -- Optional: adds a description for :h keymap
 })
 
-vim.keymap.set("n", "<Tab>e", ":Explore<CR>", {
-	noremap = true,
-	silent = true, -- Optional: makes the command silent (no feedback in command line)
-	desc = "Explore file tree", -- Optional: adds a description for :h keymap
-})
-
 vim.keymap.set("n", "<Tab>h", "<C-w>h", {
 	noremap = true,
 	silent = true, -- Optional: makes the command silent (no feedback in command line)
@@ -60,6 +53,18 @@ vim.keymap.set("n", "<Tab>l", "<C-w>l", {
 	desc = "Move to the right buffer", -- Optional: adds a description for :h keymap
 })
 
+vim.keymap.set("n", "<Tab>j", "<C-w>j", {
+	noremap = true,
+	silent = true, -- Optional: makes the command silent (no feedback in command line)
+	desc = "Move to the bottom buffer", -- Optional: adds a description for :h keymap
+})
+
+vim.keymap.set("n", "<Tab>k", "<C-w>k", {
+	noremap = true,
+	silent = true, -- Optional: makes the command silent (no feedback in command line)
+	desc = "Move to the top buffer", -- Optional: adds a description for :h keymap
+})
+
 vim.keymap.set("n", "<C-s>", ":wa<CR>", {
 	noremap = true,
 	silent = true, -- Optional: makes the command silent (no feedback in command line)
@@ -67,3 +72,8 @@ vim.keymap.set("n", "<C-s>", ":wa<CR>", {
 })
 
 vim.keymap.set("n", "<esc><esc>", ":noh<CR>", { noremap = true, silent = true, desc = "Clear search highlighting" })
+
+-- Open dadbod
+vim.keymap.set("n", "<leader>d", ":DBUI<CR>", { desc = "Open Dadbod" })
+
+vim.keymap.set('t', '<esc>', "<C-\\><C-n>", { desc = 'Exit Terminal Mode' })

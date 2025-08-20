@@ -1,3 +1,11 @@
+local old_notify = vim.notify
+vim.notify = function(msg, ...)
+	if type(msg) == "string" and msg:match('config "herb_ls" not found') then
+		return
+	end
+	old_notify(msg, ...)
+end
+
 local on_attach = function(client, bufnr)
 	local opts = { noremap = true, silent = true, buffer = bufnr }
 
@@ -13,6 +21,17 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
 	vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
 	vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+
+	-- Disable diagnostics for asm_lsp
+	if client.name == "asm_lsp" then
+		vim.diagnostic.config({
+			virtual_text = false,
+			signs = false,
+			underline = false,
+			update_in_insert = false,
+			severity_sort = false,
+		}, bufnr)
+	end
 end
 
 return {
@@ -21,6 +40,24 @@ return {
 		lazy = false,
 		config = function()
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local configs = require("lspconfig.configs")
+			local lspconfig = require("lspconfig")
+
+			if not configs.herb_ls then
+				configs.herb_ls = {
+					default_config = {
+						cmd = { "herb-language-server", "--stdio" },
+						filetypes = { "eruby", "html.erb" },
+						root_dir = lspconfig.util.root_pattern("Gemfile", ".git", "."),
+						settings = {},
+					},
+				}
+			end
+
+			lspconfig.herb_ls.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+			})
 
 			require("mason").setup()
 			require("mason-lspconfig").setup({
@@ -37,8 +74,9 @@ return {
 					"asm_lsp",
 					"angularls",
 					"bashls",
-          "svelte",
-          "cssls"
+					"svelte",
+					"cssls",
+					"ruby_lsp",
 				},
 				automatic_installation = true,
 			})
@@ -134,10 +172,32 @@ return {
 				on_attach = on_attach,
 			})
 
+			require("lspconfig").ruby_lsp.setup({
+				capabilities = capabilities,
+				on_attach = on_attach,
+				cmd = { "bundle", "exec", "ruby-lsp" }, -- <--- Add this line!
+				filetypes = { "ruby", "rb" },
+				init_options = {
+					formatter = "standard",
+					linters = { "standard" },
+					addonSettings = {
+						["Ruby LSP Rails"] = {
+							enablePendingMigrationsPrompt = false,
+						},
+					},
+				},
+			})
+
 			-- Add this configuration for rust_analyzer
 			require("lspconfig").rust_analyzer.setup({
 				capabilities = capabilities,
 				on_attach = on_attach,
+				settings = {
+					["rust-analyzer"] = {
+						cargo = { buildScripts = { enable = true } },
+						procMacro = { enable = true },
+					},
+				},
 			})
 
 			require("lspconfig").ols.setup({
@@ -153,6 +213,18 @@ return {
 			require("lspconfig").asm_lsp.setup({
 				capabilities = capabilities,
 				on_attach = on_attach,
+				cmd = { "asm-lsp" },
+				filetypes = { "asm", "s", "S" }, -- Filetypes for 6502 assembly
+				root_dir = require("lspconfig.util").root_pattern(".asm-lsp.toml", ".git"),
+				settings = {
+					asm_lsp = {
+						assembler = "ca65", -- Explicitly specify ca65 for 6502
+						instruction_set = "6502", -- Specify 6502 instruction set
+						diagnostic = {
+							compiler = "none", -- Disable diagnostics due to DASM limitations
+						},
+					},
+				},
 			})
 
 			-- Setup Lua LSP Server
@@ -172,9 +244,10 @@ return {
 					"*.cpp",
 					"*.rs",
 					"*.asm",
-          "*.sh",
-          "*.svelte",
-          "*.css",
+					"*.sh",
+					"*.svelte",
+					"*.css",
+					"*.rb",
 				},
 				callback = function(event)
 					local filetype = vim.bo[event.buf].filetype
@@ -211,6 +284,8 @@ return {
 						vim.cmd("LspStart svelte")
 					elseif filetype == "css" then
 						vim.cmd("LspStart cssls")
+					elseif filetype == "rb" then
+						vim.cmd("LspStart ruby_lsp")
 					end
 				end,
 			})

@@ -16,7 +16,6 @@ return {
       { "<leader>rn", desc = "Rename" },
       { "<leader>c", group="Code",desc = "Code" },
       { "<leader>ca", desc = "Actions" },
-      { "<leader>e", group="Error",desc = "Error" },
       { "<leader>h", group="Harpoon",desc = "Harpoon" },
       { "<leader>f", group="Telescope",desc = "Telescope" },
       { "<leader>t", group="Terminal",desc = "Terminal" },

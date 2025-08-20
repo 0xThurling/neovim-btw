@@ -7,5 +7,7 @@ return {
     vim.g.dbs = {
       my_database = 'mysql://root@localhost:3306/testing'
     }
+
+    vim.keymap.set('n', '<leader>d', ':DBUI', { desc = 'Open Dadbod'});
   end,
 }
