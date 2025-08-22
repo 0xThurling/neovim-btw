@@ -77,3 +77,5 @@ vim.keymap.set("n", "<esc><esc>", ":noh<CR>", { noremap = true, silent = true, d
 vim.keymap.set("n", "<leader>d", ":DBUI<CR>", { desc = "Open Dadbod" })
 
 vim.keymap.set('t', '<esc>', "<C-\\><C-n>", { desc = 'Exit Terminal Mode' })
+
+vim.keymap.set("i", "<S-Backspace>", "<C-o>db")
