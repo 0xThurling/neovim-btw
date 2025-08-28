@@ -5,5 +5,7 @@ return {
 		require("luasnip.loaders.from_lua").lazy_load({ paths = { vim.fn.stdpath("config") .. "/lua/custom/snippets" } })
 		require("luasnip").filetype_extend("ruby", { "rails" })
 		require("luasnip").filetype_extend("eruby", { "html", "ruby" })
+		require("luasnip").filetype_extend("cs", { "cs" })
+		require("luasnip").filetype_extend("razor", { "razor", "html" })
 	end,
 }

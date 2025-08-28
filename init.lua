@@ -1,3 +1,9 @@
+vim.filetype.add({
+  extension = {
+    cshtml = "razor",
+  },
+})
+
 vim.o.number = true
 vim.o.relativenumber = true
 
@@ -27,4 +33,3 @@ if not ok then
 end
 
 vim.cmd('colorscheme gruvbox')
-

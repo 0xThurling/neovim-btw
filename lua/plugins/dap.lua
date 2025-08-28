@@ -18,14 +18,36 @@ return {
 			local mason_nvim_dap = require("mason-nvim-dap")
 
 			-- Initialize Mason
-			mason.setup()
+			mason.setup({
+				ensure_installed = {
+					"csharpier", -- for formatting
+				},
+			})
 			mason_lspconfig.setup({
 				ensure_installed = { "rust_analyzer" },
 			})
 			mason_nvim_dap.setup({
-				ensure_installed = { "codelldb", "rdbg" },
+				ensure_installed = { "codelldb", "rdbg", "netcoredbg" },
 				handlers = {},
 			})
+
+			-- C# DAP configuration
+			dap.adapters.coreclr = {
+				type = "executable",
+				command = vim.fn.exepath("netcoredbg"),
+				args = { "--interpreter=vscode" },
+			}
+
+			dap.configurations.cs = {
+				{
+					type = "coreclr",
+					name = "Launch",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to dll or exe: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
+					end,
+				},
+			}
 
 			-- Ruby DAP configuration
 			dap.adapters.rdbg = {
@@ -105,7 +127,7 @@ return {
 
 			-- Setup nvim-dap-ui for debugging UI
 			local dapui = require("dapui")
-      dapui.setup()
+			dapui.setup()
 
 			-- Automatically open/close DAP UI
 			dap.listeners.after.event_initialized["dapui_config"] = function()

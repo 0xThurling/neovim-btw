@@ -39,6 +39,16 @@ return {
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		config = function()
+			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+				opts = opts or {}
+				opts.border = opts.border or "rounded"
+				if syntax == "" or syntax == nil then
+					syntax = "markdown"
+			  end	
+				return orig_util_open_floating_preview(contents, syntax, opts, ...)
+			end
+
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			local configs = require("lspconfig.configs")
 			local lspconfig = require("lspconfig")
@@ -59,14 +69,18 @@ return {
 				on_attach = on_attach,
 			})
 
-			require("mason").setup()
+			require("mason").setup({
+				registries = {
+					"github:mason-org/mason-registry",
+					"github:Crashdummyy/mason-registry", -- Add custom registry
+				},
+			})
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"lua_ls",
 					"ts_ls",
 					"gopls",
 					"html",
-					"omnisharp",
 					"clangd",
 					"pyright",
 					"sqlls",
@@ -138,12 +152,6 @@ return {
 				capabilities = capabilities,
 				on_attach = on_attach,
 				filetypes = { "html", "htmldjango" },
-			})
-
-			require("lspconfig").omnisharp.setup({
-				capabilities = capabilities,
-				on_attach = on_attach,
-				cmd = { "omnisharp", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) },
 			})
 
 			-- Configure clangd for C++
@@ -264,8 +272,6 @@ return {
 						vim.cmd("LspStart gopls")
 					elseif filetype == "html" then
 						vim.cmd("LspStart html")
-					elseif filetype == "cs" then
-						vim.cmd("LspStart omnisharp")
 					elseif filetype == "cpp" or filetype == "c" then
 						vim.cmd("LspStart clangd")
 					elseif filetype == "python" then

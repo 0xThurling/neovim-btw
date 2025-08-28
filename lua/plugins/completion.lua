@@ -14,6 +14,7 @@ return {
 		config = function()
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
+			cmp.register_source("easy-dotnet", require("easy-dotnet").package_completion_source)
 			cmp.setup({
 				enabled = true,
 				snippet = {
@@ -45,6 +46,7 @@ return {
 				sources = cmp.config.sources({
 					{ name = "vim-dadbod-completion" },
 					{ name = "nvim_lsp" },
+					{ name = "easy-dotnet" },
 					{ name = "luasnip" },
 					{ name = "buffer" },
 					{ name = "path" },
