@@ -78,7 +78,7 @@ vim.keymap.set("n", "<leader>d", ":DBUI<CR>", { desc = "Open Dadbod" })
 
 vim.keymap.set('t', '<esc>', "<C-\\><C-n>", { desc = 'Exit Terminal Mode' })
 
-vim.keymap.set("i", "<S-Backspace>", "<C-o>db<C-o>x")
+vim.keymap.set("i", "<M-Backspace>", "<C-o>db")
 
 vim.keymap.set('n', '<leader>xd', function()
   vim.diagnostic.setloclist()

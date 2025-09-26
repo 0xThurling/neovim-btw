@@ -32,4 +32,4 @@ if not ok then
     print('Failed to load plugins')
 end
 
-vim.cmd('colorscheme gruvbox')
+vim.cmd('colorscheme darkvoid')

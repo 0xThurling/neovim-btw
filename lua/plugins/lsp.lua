@@ -1,44 +1,11 @@
-local old_notify = vim.notify
-vim.notify = function(msg, ...)
-	if type(msg) == "string" and msg:match('config "herb_ls" not found') then
-		return
-	end
-	old_notify(msg, ...)
-end
 
-local on_attach = function(client, bufnr)
-	local opts = { noremap = true, silent = true, buffer = bufnr }
-
-	-- Go to definition
-	vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
-
-	-- Go to implementation
-	vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, opts)
-
-	-- You can add more LSP-related keybindings here
-	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-	vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
-	vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
-
-	-- Disable diagnostics for asm_lsp
-	if client.name == "asm_lsp" then
-		vim.diagnostic.config({
-			virtual_text = false,
-			signs = false,
-			underline = false,
-			update_in_insert = false,
-			severity_sort = false,
-		}, bufnr)
-	end
-end
 
 return {
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		config = function()
+			local lsp_utils = require("core.lsp_utils")
 			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
 			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 				opts = opts or {}
@@ -48,7 +15,6 @@ return {
 			  end	
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
-
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			local configs = require("lspconfig.configs")
 			local lspconfig = require("lspconfig")
@@ -66,7 +32,7 @@ return {
 
 			lspconfig.herb_ls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			require("mason").setup({
@@ -98,7 +64,7 @@ return {
 			-- Configure lua_ls
 			require("lspconfig").lua_ls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 				settings = {
 					Lua = {
 						diagnostics = {
@@ -114,50 +80,50 @@ return {
 			-- CSS LSP
 			require("lspconfig").cssls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Bash LSP
 			require("lspconfig").bashls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Svelte LSP
 			require("lspconfig").svelte.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Angular Language Server
 			require("lspconfig").angularls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Configure tsserver
 			require("lspconfig").ts_ls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Configure gopls
 			require("lspconfig").gopls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Configure HTML
 			require("lspconfig").html.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 				filetypes = { "html", "htmldjango" },
 			})
 
 			-- Configure clangd for C++
 			require("lspconfig").clangd.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 				cmd = { "clangd", "--background-index" },
 				root_dir = require("lspconfig").util.root_pattern("compile_commands.json", ".clangd"),
 			})
@@ -165,24 +131,24 @@ return {
 			-- Configure pyright for Python
 			require("lspconfig").pyright.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Configure sqlls for SQL
 			require("lspconfig").sqlls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Configure ZIG lsp
 			require("lspconfig").zls.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			require("lspconfig").ruby_lsp.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 				cmd = { "bundle", "exec", "ruby-lsp" }, -- <--- Add this line!
 				filetypes = { "ruby", "rb" },
 				init_options = {
@@ -199,7 +165,7 @@ return {
 			-- Add this configuration for rust_analyzer
 			require("lspconfig").rust_analyzer.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 				settings = {
 					["rust-analyzer"] = {
 						cargo = { buildScripts = { enable = true } },
@@ -220,7 +186,7 @@ return {
 			-- Add this configuration for asm_lsp
 			require("lspconfig").asm_lsp.setup({
 				capabilities = capabilities,
-				on_attach = on_attach,
+				on_attach = lsp_utils.on_attach,
 				cmd = { "asm-lsp" },
 				filetypes = { "asm", "s", "S" }, -- Filetypes for 6502 assembly
 				root_dir = require("lspconfig.util").root_pattern(".asm-lsp.toml", ".git"),
@@ -272,8 +238,7 @@ return {
 						vim.cmd("LspStart gopls")
 					elseif filetype == "html" then
 						vim.cmd("LspStart html")
-					elseif filetype == "cpp" or filetype == "c" then
-						vim.cmd("LspStart clangd")
+					
 					elseif filetype == "python" then
 						vim.cmd("LspStart pylsp")
 					elseif filetype == "sql" then
@@ -307,3 +272,5 @@ return {
 		end,
 	},
 }
+
+
