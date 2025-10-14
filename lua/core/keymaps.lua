@@ -84,3 +84,6 @@ vim.keymap.set('n', '<leader>xd', function()
   vim.diagnostic.setloclist()
 end)
 
+vim.keymap.set('n', '<leader>e', function()
+  vim.diagnostic.open_float()
+end, { desc = 'Show diagnostics in a floating window' })

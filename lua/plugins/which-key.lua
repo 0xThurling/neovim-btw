@@ -19,6 +19,7 @@ return {
       { "<leader>h", group="Harpoon",desc = "Harpoon" },
       { "<leader>f", group="Telescope",desc = "Telescope" },
       { "<leader>t", group="Terminal",desc = "Terminal" },
+      { "<leader>e", desc = "Show diagnostics in a floating window" },
     })
   end,
 }
