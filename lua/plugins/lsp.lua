@@ -1,10 +1,10 @@
-
-
 return {
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		config = function()
+			local lspconfig = vim.lsp.config
+			local util = lspconfig.util
 			local lsp_utils = require("core.lsp_utils")
 			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
 			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
@@ -12,36 +12,10 @@ return {
 				opts.border = opts.border or "rounded"
 				if syntax == "" or syntax == nil then
 					syntax = "markdown"
-			  end	
+				  end	
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			local configs = require("lspconfig.configs")
-			local lspconfig = require("lspconfig")
-
-			if not configs.herb_ls then
-				configs.herb_ls = {
-					default_config = {
-						cmd = { "herb-language-server", "--stdio" },
-						filetypes = { "eruby", "html.erb" },
-						root_dir = lspconfig.util.root_pattern("Gemfile", ".git", "."),
-						settings = {},
-					},
-				}
-			end
-
-			lspconfig.herb_ls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			require("mason").setup({
-				registries = {
-					"github:mason-org/mason-registry",
-					"github:Crashdummyy/mason-registry", -- Add custom registry
-				},
-			})
-			require("mason-lspconfig").setup({
+			local _ = require("cmp_nvim_lsp").default_capabilities({
 				ensure_installed = {
 					"lua_ls",
 					"ts_ls",
@@ -56,149 +30,49 @@ return {
 					"bashls",
 					"svelte",
 					"cssls",
-					"ruby_lsp",
+					"herb_ls",
 				},
 				automatic_installation = true,
-			})
-
-			-- Configure lua_ls
-			require("lspconfig").lua_ls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-				settings = {
-					Lua = {
-						diagnostics = {
-							globals = { "vim" },
-						},
-						workspace = {
-							library = vim.api.nvim_get_runtime_file("", true),
-						},
-					},
-				},
-			})
-
-			-- CSS LSP
-			require("lspconfig").cssls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Bash LSP
-			require("lspconfig").bashls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Svelte LSP
-			require("lspconfig").svelte.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Angular Language Server
-			require("lspconfig").angularls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Configure tsserver
-			require("lspconfig").ts_ls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Configure gopls
-			require("lspconfig").gopls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Configure HTML
-			require("lspconfig").html.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-				filetypes = { "html", "htmldjango" },
-			})
-
-			-- Configure clangd for C++
-			require("lspconfig").clangd.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-				cmd = { "clangd", "--background-index" },
-				root_dir = require("lspconfig").util.root_pattern("compile_commands.json", ".clangd"),
-			})
-
-			-- Configure pyright for Python
-			require("lspconfig").pyright.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Configure sqlls for SQL
-			require("lspconfig").sqlls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			-- Configure ZIG lsp
-			require("lspconfig").zls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			require("lspconfig").ruby_lsp.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-				cmd = { "bundle", "exec", "ruby-lsp" }, -- <--- Add this line!
-				filetypes = { "ruby", "rb" },
-				init_options = {
-					formatter = "standard",
-					linters = { "standard" },
-					addonSettings = {
-						["Ruby LSP Rails"] = {
-							enablePendingMigrationsPrompt = false,
-						},
-					},
-				},
-			})
-
-			-- Add this configuration for rust_analyzer
-			require("lspconfig").rust_analyzer.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-				settings = {
-					["rust-analyzer"] = {
-						cargo = { buildScripts = { enable = true } },
-						procMacro = { enable = true },
-					},
-				},
-			})
-
-			require("lspconfig").ols.setup({
-				init_options = {
-					checker_args = "-strict-style",
-					collections = {
-						{ name = "shared", path = vim.fn.expand("$HOME/odin") },
-					},
-				},
-			})
-
-			-- Add this configuration for asm_lsp
-			require("lspconfig").asm_lsp.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-				cmd = { "asm-lsp" },
-				filetypes = { "asm", "s", "S" }, -- Filetypes for 6502 assembly
-				root_dir = require("lspconfig.util").root_pattern(".asm-lsp.toml", ".git"),
-				settings = {
-					asm_lsp = {
-						assembler = "ca65", -- Explicitly specify ca65 for 6502
-						instruction_set = "6502", -- Specify 6502 instruction set
-						diagnostic = {
-							compiler = "none", -- Disable diagnostics due to DASM limitations
-						},
-					},
-				},
+				handlers = {
+					function(server_name)
+						require("mason-lspconfig").setup({
+							capabilities = capabilities,
+							on_attach = lsp_utils.on_attach,
+						})
+					end,
+					["lua_ls"] = function()
+						lspconfig.lua_ls.setup({
+							capabilities = capabilities,
+							on_attach = lsp_utils.on_attach,
+							settings = {
+								Lua = {
+									diagnostics = {
+										globals = { "vim" },
+									},
+									workspace = {
+										library = vim.api.nvim_get_runtime_file("", true),
+									},
+								},
+							},
+						})
+					end,
+					["herb_ls"] = function()
+						if not lspconfig.configs.herb_ls then
+							lspconfig.configs.herb_ls = {
+								default_config = {
+									cmd = { "herb-language-server", "--stdio" },
+									filetypes = { "eruby", "html.erb" },
+									root_dir = util.root_pattern("Gemfile", ".git", "."),
+									settings = {},
+								},
+							}
+						end
+						lspconfig.herb_ls.setup({
+							capabilities = capabilities,
+							on_attach = lsp_utils.on_attach,
+						})
+					end,
+				}
 			})
 
 			-- Setup Lua LSP Server
@@ -238,7 +112,6 @@ return {
 						vim.cmd("LspStart gopls")
 					elseif filetype == "html" then
 						vim.cmd("LspStart html")
-					
 					elseif filetype == "python" then
 						vim.cmd("LspStart pylsp")
 					elseif filetype == "sql" then
@@ -255,8 +128,6 @@ return {
 						vim.cmd("LspStart svelte")
 					elseif filetype == "css" then
 						vim.cmd("LspStart cssls")
-					elseif filetype == "rb" then
-						vim.cmd("LspStart ruby_lsp")
 					end
 				end,
 			})
@@ -272,5 +143,3 @@ return {
 		end,
 	},
 }
-
-

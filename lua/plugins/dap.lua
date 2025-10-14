@@ -11,21 +11,10 @@ return {
 			"jay-babu/mason-nvim-dap.nvim",
 		},
 		config = function()
-			local mason = require("mason")
-			local mason_lspconfig = require("mason-lspconfig")
 			local rust_tools = require("rust-tools")
 			local dap = require("dap")
 			local mason_nvim_dap = require("mason-nvim-dap")
 
-			-- Initialize Mason
-			mason.setup({
-				ensure_installed = {
-					"csharpier", -- for formatting
-				},
-			})
-			mason_lspconfig.setup({
-				ensure_installed = { "rust_analyzer" },
-			})
 			mason_nvim_dap.setup({
 				ensure_installed = { "codelldb", "rdbg", "netcoredbg" },
 				handlers = {},
@@ -74,24 +63,6 @@ return {
 					remoteWorkspace = "${workspaceFolder}",
 				},
 			}
-
-			-- Get codelldb paths dynamically
-			local mason_registry = require("mason-registry")
-			local codelldb = mason_registry.get_package("codelldb")
-			local extension_path = codelldb:get_install_path()
-			local codelldb_path = extension_path .. "/extension/adapter/codelldb"
-
-			-- Set liblldb_path based on OS
-			local liblldb_path
-			if vim.fn.has("mac") == 1 then
-				liblldb_path = extension_path .. "/extension/lldb/lib/liblldb.dylib"
-			elseif vim.fn.has("unix") == 1 then
-				liblldb_path = extension_path .. "/extension/lldb/lib/liblldb.so"
-			elseif vim.fn.has("win32") == 1 then
-				liblldb_path = extension_path .. "/extension/lldb/bin/liblldb.dll"
-			else
-				error("Unsupported operating system for codelldb")
-			end
 
 			-- Setup rust-tools with debugger config
 			rust_tools.setup({

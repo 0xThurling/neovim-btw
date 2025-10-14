@@ -1,15 +1,11 @@
 return {
   {'aliqyan-21/darkvoid.nvim'},
   {
-    { "mason-org/mason.nvim", branch = "v1.x" },
-    { "mason-org/mason-lspconfig.nvim", branch = "v1.x" },
-  },
-	{
 		"nvim-tree/nvim-web-devicons",
 		lazy = true,
 	},
 	{
-		"neovim/nvim-lspconfig",
+
 		"tris203/rzls.nvim",
 	},
 	{
@@ -19,13 +15,6 @@ return {
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"L3MON4D3/LuaSnip",
-		},
-	},
-	{
-		"tadmccorkle/markdown.nvim",
-		ft = "markdown", -- or 'event = "VeryLazy"'
-		opts = {
-			-- configuration here or empty for defaults
 		},
 	},
 	{
