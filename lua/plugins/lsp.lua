@@ -3,23 +3,19 @@ return {
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		config = function()
-			local lspconfig = vim.lsp.config
-			local util = lspconfig.util
-			local lsp_utils = require("core.lsp_utils")
 			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
 			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 				opts = opts or {}
 				opts.border = opts.border or "rounded"
 				if syntax == "" or syntax == nil then
 					syntax = "markdown"
-				  end	
+				end
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 			require("mason-lspconfig").setup({
 				ensure_installed = {
-					"lua_ls",
 					"gopls",
 					"html",
 					"clangd",
@@ -39,8 +35,8 @@ return {
 					"lemminx", -- XML
 				},
 				automatic_installation = true,
+        automatic_enable = false
 			})
-
 			local lspconfig = require("lspconfig")
 			local lsp_utils = require("core.lsp_utils")
 
@@ -49,16 +45,12 @@ return {
 				on_attach = lsp_utils.on_attach,
 				settings = {
 					Lua = {
-						diagnostics = {
-							globals = { "vim" },
-						},
 						workspace = {
 							library = vim.api.nvim_get_runtime_file("", true),
 						},
 					},
 				},
 			})
-
 			lspconfig.gopls.setup({
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
@@ -152,6 +144,8 @@ return {
 				update_in_insert = false,
 				severity_sort = true,
 			})
+
+			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
 		end,
 	},
 }
