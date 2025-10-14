@@ -15,10 +15,11 @@ return {
 				  end	
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
-			local _ = require("cmp_nvim_lsp").default_capabilities({
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"lua_ls",
-					"ts_ls",
 					"gopls",
 					"html",
 					"clangd",
@@ -30,106 +31,117 @@ return {
 					"bashls",
 					"svelte",
 					"cssls",
-					"herb_ls",
+					"taplo",
+					"tailwindcss",
+					"emmet_ls",
+					"jsonls",
+					"marksman",
+					"lemminx", -- XML
 				},
 				automatic_installation = true,
-				handlers = {
-					function(server_name)
-						require("mason-lspconfig").setup({
-							capabilities = capabilities,
-							on_attach = lsp_utils.on_attach,
-						})
-					end,
-					["lua_ls"] = function()
-						lspconfig.lua_ls.setup({
-							capabilities = capabilities,
-							on_attach = lsp_utils.on_attach,
-							settings = {
-								Lua = {
-									diagnostics = {
-										globals = { "vim" },
-									},
-									workspace = {
-										library = vim.api.nvim_get_runtime_file("", true),
-									},
-								},
-							},
-						})
-					end,
-					["herb_ls"] = function()
-						if not lspconfig.configs.herb_ls then
-							lspconfig.configs.herb_ls = {
-								default_config = {
-									cmd = { "herb-language-server", "--stdio" },
-									filetypes = { "eruby", "html.erb" },
-									root_dir = util.root_pattern("Gemfile", ".git", "."),
-									settings = {},
-								},
-							}
-						end
-						lspconfig.herb_ls.setup({
-							capabilities = capabilities,
-							on_attach = lsp_utils.on_attach,
-						})
-					end,
-				}
 			})
 
-			-- Setup Lua LSP Server
-			vim.api.nvim_create_autocmd({ "BufEnter" }, {
-				pattern = {
-					"*.lua",
-					"*.ts",
-					"*.tsx",
-					"*.js",
-					"*.jsx",
-					"*.go",
-					"*.html",
-					"*.cs",
-					"*.py",
-					"*.c",
-					"*.h",
-					"*.cpp",
-					"*.rs",
-					"*.asm",
-					"*.sh",
-					"*.svelte",
-					"*.css",
-					"*.rb",
+			local lspconfig = require("lspconfig")
+			local lsp_utils = require("core.lsp_utils")
+
+			lspconfig.lua_ls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+				settings = {
+					Lua = {
+						diagnostics = {
+							globals = { "vim" },
+						},
+						workspace = {
+							library = vim.api.nvim_get_runtime_file("", true),
+						},
+					},
 				},
-				callback = function(event)
-					local filetype = vim.bo[event.buf].filetype
-					if filetype == "lua" then
-						vim.cmd("LspStart lua_ls")
-					elseif
-						filetype == "typescript"
-						or filetype == "javascript"
-						or filetype == "typescriptreact"
-						or filetype == "javascriptreact"
-					then
-						vim.cmd("LspStart ts_ls")
-					elseif filetype == "go" then
-						vim.cmd("LspStart gopls")
-					elseif filetype == "html" then
-						vim.cmd("LspStart html")
-					elseif filetype == "python" then
-						vim.cmd("LspStart pylsp")
-					elseif filetype == "sql" then
-						vim.cmd("LspStart sqlls")
-					elseif filetype == "odin" then
-						vim.cmd("LspStart ols")
-					elseif filetype == "rust" then
-						vim.cmd("LspStart rust_analyzer")
-					elseif filetype == "asm" then
-						vim.cmd("LspStart asm_lsp")
-					elseif filetype == "sh" then
-						vim.cmd("LspStart bashls")
-					elseif filetype == "svelte" then
-						vim.cmd("LspStart svelte")
-					elseif filetype == "css" then
-						vim.cmd("LspStart cssls")
-					end
-				end,
+			})
+
+			lspconfig.gopls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.html.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.clangd.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.pyright.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.sqlls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.rust_analyzer.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.asm_lsp.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.angularls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.bashls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.svelte.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.cssls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.taplo.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.tailwindcss.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.emmet_ls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.jsonls.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.marksman.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
+			lspconfig.lemminx.setup({
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
 			})
 
 			-- Setup the Error float window
