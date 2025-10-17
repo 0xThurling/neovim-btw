@@ -1,3 +1,5 @@
+vim.deprecate = function(...) end
+
 vim.filetype.add({
   extension = {
     cshtml = "razor",

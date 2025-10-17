@@ -37,10 +37,9 @@ return {
 				automatic_installation = true,
         automatic_enable = false
 			})
-			local lspconfig = require("lspconfig")
 			local lsp_utils = require("core.lsp_utils")
 
-			lspconfig.lua_ls.setup({
+      vim.lsp.config('lua_ls', {
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
 				settings = {
@@ -50,91 +49,91 @@ return {
 						},
 					},
 				},
-			})
-			lspconfig.gopls.setup({
+      })
+
+			vim.lsp.config('clangd', {
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
 			})
 
-			lspconfig.html.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
+      vim.lsp.enable('lua_ls')
+      vim.lsp.enable('clangd')
 
-			lspconfig.clangd.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.pyright.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.sqlls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.rust_analyzer.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.asm_lsp.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.angularls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.bashls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.svelte.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.cssls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.taplo.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.tailwindcss.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.emmet_ls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.jsonls.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.marksman.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
-
-			lspconfig.lemminx.setup({
-				capabilities = capabilities,
-				on_attach = lsp_utils.on_attach,
-			})
+			-- lspconfig.html.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			--
+			-- lspconfig.pyright.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.sqlls.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.rust_analyzer.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.asm_lsp.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.angularls.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.bashls.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.svelte.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.cssls.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.taplo.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.tailwindcss.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.emmet_ls.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.jsonls.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.marksman.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
+			--
+			-- lspconfig.lemminx.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_attach = lsp_utils.on_attach,
+			-- })
 
 			-- Setup the Error float window
 			vim.diagnostic.config({
