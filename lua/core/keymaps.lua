@@ -87,3 +87,6 @@ end)
 vim.keymap.set('n', '<leader>e', function()
   vim.diagnostic.open_float()
 end, { desc = 'Show diagnostics in a floating window' })
+
+-- Devdocs
+vim.keymap.set("n", "<leader>io", "<cmd>DevdocsOpenFloat<cr>", { desc = "Open Devdocs" })

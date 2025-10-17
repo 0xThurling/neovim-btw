@@ -1,5 +1,3 @@
-
-
 local lsp_utils = require("core.lsp_utils")
 
 return {

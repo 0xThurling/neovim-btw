@@ -1,7 +1,8 @@
 return {
-    {
-        "ellisonleao/glow.nvim",
-        config = true,
-        cmd = "Glow",
-    },
+	{
+		"ellisonleao/glow.nvim",
+		config = true,
+		cmd = "Glow",
+	},
 }
+

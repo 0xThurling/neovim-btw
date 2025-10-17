@@ -14,6 +14,13 @@ return {
 			end
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
+      require("mason").setup({
+				registries = {
+					"github:mason-org/mason-registry",
+					"github:Crashdummyy/mason-registry", -- Add custom registry
+				},
+			})
+
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"gopls",
