@@ -1,4 +1,12 @@
+local util = require("lspconfig.util")
 
+-- Sets the path up so that the LSP know where to find CPMs function/class definitions
+local path = util.root_pattern(".git")() or vim.fn.getcwd()
+local cpm_definitions_path = path .. "/.config/forge/definitions"
+
+local library_paths = vim.api.nvim_get_runtime_file("", true)
+
+table.insert(library_paths, cpm_definitions_path);
 
 return {
 	{
@@ -12,12 +20,23 @@ return {
 				opts.border = opts.border or "rounded"
 				if syntax == "" or syntax == nil then
 					syntax = "markdown"
-			  end	
+				end
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			local configs = require("lspconfig.configs")
 			local lspconfig = require("lspconfig")
+
+			if not configs.herb_ls then
+				configs.herb_ls = {
+					default_config = {
+						cmd = { "herb-language-server", "--stdio" },
+						filetypes = { "eruby", "html.erb" },
+						root_dir = lspconfig.util.root_pattern("Gemfile", ".git", "."),
+						settings = {},
+					},
+				}
+			end
 
 			if not configs.herb_ls then
 				configs.herb_ls = {
@@ -71,7 +90,7 @@ return {
 							globals = { "vim" },
 						},
 						workspace = {
-							library = vim.api.nvim_get_runtime_file("", true),
+							library = library_paths
 						},
 					},
 				},
@@ -124,7 +143,13 @@ return {
 			require("lspconfig").clangd.setup({
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
-				cmd = { "clangd", "--background-index" },
+				cmd = {
+					"clangd",
+					"--background-index",
+					"--header-insertion=never",
+					"--clang-tidy",
+					"--completion-style=detailed",
+				},
 				root_dir = require("lspconfig").util.root_pattern("compile_commands.json", ".clangd"),
 			})
 
@@ -238,7 +263,6 @@ return {
 						vim.cmd("LspStart gopls")
 					elseif filetype == "html" then
 						vim.cmd("LspStart html")
-					
 					elseif filetype == "python" then
 						vim.cmd("LspStart pylsp")
 					elseif filetype == "sql" then
@@ -272,5 +296,3 @@ return {
 		end,
 	},
 }
-
-

@@ -1,5 +1,11 @@
 return {
   {'aliqyan-21/darkvoid.nvim'},
+  { 
+    "danymat/neogen", 
+    config = true,
+    -- Uncomment next line if you want to follow only stable versions
+    -- version = "*" 
+  },
   {
     { "mason-org/mason.nvim", branch = "v1.x" },
     { "mason-org/mason-lspconfig.nvim", branch = "v1.x" },
