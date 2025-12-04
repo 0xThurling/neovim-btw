@@ -88,5 +88,8 @@ vim.keymap.set('n', '<leader>e', function()
   vim.diagnostic.open_float()
 end, { desc = 'Show diagnostics in a floating window' })
 
+vim.keymap.set("n", "<leader>rs", function() vim.cmd("LspRestart roslyn") end, { buffer = bufnr, desc = "Restart Roslyn LSP Server" })
+
 -- Devdocs
 vim.keymap.set("n", "<leader>io", "<cmd>DevdocsOpenFloat<cr>", { desc = "Open Devdocs" })
+

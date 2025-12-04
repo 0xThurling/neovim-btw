@@ -1,5 +1,3 @@
-local lsp_utils = require("core.lsp_utils")
-
 return {
 	-- lazy.nvim
 	{
@@ -31,6 +29,23 @@ return {
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
 
+			local on_attach = function(client, bufnr)
+				local opts = { noremap = true, silent = true, buffer = bufnr }
+
+				-- Go to definition
+				vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
+
+				-- Go to implementation
+				vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, opts)
+
+				-- You can add more LSP-related keybindings here
+				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+				vim.keymap.set("n", "<leader>ca", require("roslyn").code_action_group, opts)
+				vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
+				vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+				vim.keymap.set("n", "<leader>rs", function() vim.cmd("LspRestart roslyn") end, { buffer = bufnr, desc = "Restart Roslyn LSP Server" })
+			end
+
 			local _ = require("mason-registry")
 
 			local rzls_path = vim.fn.expand("$MASON/packages/rzls/libexec")
@@ -46,8 +61,10 @@ return {
 				vim.fs.joinpath(rzls_path, "RazorExtension", "Microsoft.VisualStudioCode.RazorExtension.dll"),
 			}
 
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			vim.lsp.config("roslyn", {
-				on_attach = lsp_utils.on_attach,
+				on_attach = on_attach,
+				capabilities = capabilities,
 				cmd = cmd,
 				handlers = require("rzls.roslyn_handlers"),
 				settings = {
