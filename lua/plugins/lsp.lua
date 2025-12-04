@@ -1,3 +1,25 @@
+-- Helper: find project root by looking for a marker (like .git)
+local function find_root(marker)
+  local cwd = vim.fn.getcwd()
+  local path = cwd
+
+  while path ~= "/" do
+    if vim.fn.isdirectory(path .. "/" .. marker) == 1 then
+      return path
+    end
+    path = vim.fn.fnamemodify(path, ":h")
+  end
+
+  return cwd
+end
+
+-- Use the helper instead of lspconfig.util.root_pattern
+local path = find_root(".git")
+local cpm_definitions_path = path .. "/.config/forge/definitions"
+
+local library_paths = vim.api.nvim_get_runtime_file("", true)
+table.insert(library_paths, cpm_definitions_path)
+
 return {
 	{
 		"neovim/nvim-lspconfig",
@@ -52,7 +74,7 @@ return {
 				settings = {
 					Lua = {
 						workspace = {
-							library = vim.api.nvim_get_runtime_file("", true),
+							library = library_paths
 						},
 					},
 				},
