@@ -33,5 +33,3 @@ local ok, _ = pcall(require, 'core.plugins')
 if not ok then
     print('Failed to load plugins')
 end
-
-vim.cmd('colorscheme gruvbox')

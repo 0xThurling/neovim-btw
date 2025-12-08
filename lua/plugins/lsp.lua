@@ -71,6 +71,7 @@ return {
       vim.lsp.config('lua_ls', {
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
+        cmd = {'/usr/bin/lua-language-server'},
 				settings = {
 					Lua = {
 						workspace = {
