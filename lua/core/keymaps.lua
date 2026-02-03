@@ -29,6 +29,8 @@ vim.keymap.set(
 	{ noremap = true, silent = true, desc = "Open floating terminal" }
 )
 
+vim.keymap.set('n', '<A-v>', '<C-v>', { desc = 'Visual Block Mode' })
+
 vim.keymap.set("n", "<Tab>q", ":q!<CR>", {
 	noremap = true,
 	silent = true, -- Optional: makes the command silent (no feedback in command line)
