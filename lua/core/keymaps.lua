@@ -29,6 +29,8 @@ vim.keymap.set(
 	{ noremap = true, silent = true, desc = "Open floating terminal" }
 )
 
+vim.keymap.set('n', '<S-C-v>', '<C-v>', { desc = 'Visual Block Mode (requires terminal paste shortcut disabled)' })
+vim.keymap.set('n', '<C-v>', '<C-v>', { desc = 'Visual Block Mode' })
 vim.keymap.set('n', '<A-v>', '<C-v>', { desc = 'Visual Block Mode' })
 
 vim.keymap.set("n", "<Tab>q", ":q!<CR>", {
