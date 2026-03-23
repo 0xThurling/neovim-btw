@@ -90,8 +90,18 @@ vim.keymap.set('n', '<leader>e', function()
   vim.diagnostic.open_float()
 end, { desc = 'Show diagnostics in a floating window' })
 
-vim.keymap.set("n", "<leader>rs", function() vim.cmd("LspRestart roslyn") end, { buffer = bufnr, desc = "Restart Roslyn LSP Server" })
+vim.keymap.set("n", "<leader>rs", function() vim.cmd("LspRestart roslyn") end, { desc = "Restart Roslyn LSP Server" })
 
 -- Devdocs
 vim.keymap.set("n", "<leader>io", "<cmd>DevdocsOpenFloat<cr>", { desc = "Open Devdocs" })
+
+-- Code actions (fallback if no LSP attached)
+vim.keymap.set("n", "<leader>ca", function()
+  local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+  if #clients == 0 then
+    vim.notify("No LSP client attached", vim.log.levels.WARN)
+    return
+  end
+  vim.lsp.buf.code_action()
+end, { desc = "Code Actions" })
 

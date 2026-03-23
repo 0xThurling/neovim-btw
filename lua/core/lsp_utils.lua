@@ -11,7 +11,7 @@ M.on_attach = function(client, bufnr)
 
 	-- You can add more LSP-related keybindings here
 	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+	vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts)
 	vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
 	vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
 

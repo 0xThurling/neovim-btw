@@ -60,6 +60,7 @@ return {
 					"tailwindcss",
 					"emmet_ls",
 					"jsonls",
+          "pyright",
           "ts_ls",
 					"marksman",
 					"lemminx", -- XML
@@ -87,6 +88,11 @@ return {
 				on_attach = lsp_utils.on_attach,
 			})
 
+			vim.lsp.config('pyright', {
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+
 			vim.lsp.config('ts_ls', {
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
@@ -107,13 +113,10 @@ return {
       vim.lsp.enable('clangd')
       vim.lsp.enable('ts_ls')
       vim.lsp.enable('html')
+      vim.lsp.enable('pyright')
 
 			--
 			--
-			-- lspconfig.pyright.setup({
-			-- 	capabilities = capabilities,
-			-- 	on_attach = lsp_utils.on_attach,
-			-- })
 			--
 			-- lspconfig.sqlls.setup({
 			-- 	capabilities = capabilities,
