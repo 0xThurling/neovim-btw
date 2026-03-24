@@ -19,26 +19,18 @@ local prompts = {
   Concise = "Please rewrite the following text to make it more concise.",
 }
 
-local function open_gemini_terminal()
-  vim.cmd("vsplit") -- Create a new vertical split
-  local new_win_id = vim.api.nvim_get_current_win() -- Get the ID of the newly created window
-
-  -- Move the new window to the right
-  vim.cmd("wincmd L")
-
-  local bufnr = vim.api.nvim_create_buf(false, true) -- Create a new buffer for the terminal
-  vim.api.nvim_win_set_buf(new_win_id, bufnr) -- Set the new buffer to the new window
-
-  local job_id = vim.fn.termopen("gemini", {
-    on_exit = function()
-      -- Check if the buffer still exists before deleting
-      if vim.api.nvim_buf_is_valid(bufnr) then
-        vim.api.nvim_buf_delete(bufnr, { force = true })
-      end
-    end,
+local function open_kilo_terminal()
+  local buf = vim.api.nvim_create_buf(false, true)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = math.floor(vim.o.columns * 0.95),
+    height = math.floor(vim.o.lines * 0.95),
+    col = math.floor((vim.o.columns - math.floor(vim.o.columns * 0.95)) / 2),
+    row = math.floor((vim.o.lines - math.floor(vim.o.lines * 0.95)) / 2),
+    border = "rounded",
   })
-
-  vim.api.nvim_set_current_win(new_win_id) -- Make the new window the current one
+  vim.api.nvim_set_current_buf(buf)
+  vim.fn.termopen("kilo")
   vim.cmd("startinsert")
 end
 
@@ -228,13 +220,13 @@ return {
         mode = "x",
         desc = "CopilotChat - Inline chat",
       },
-      -- Custom input for Gemini
+      -- Custom input for Kilo
       {
         "<Tab>g",
         function()
-          open_gemini_terminal()
+          open_kilo_terminal()
         end,
-        desc = "Gemini - Ask input",
+        desc = "Kilo - Ask input",
       },
       -- Generate commit message based on the git diff
       {

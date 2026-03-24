@@ -180,21 +180,23 @@ local function open_glow_doc()
 	}):find()
 end
 
+local _slugs_to_mtimes = {}
+
 local function fetch_slugs_and_then(callback)
 	vim.system({"curl", "-L", "https://devdocs.io/docs.json"}, {text=true}, vim.schedule_wrap(function(res)
 		local data = vim.fn.json_decode(res.stdout)
-		local slugs_to_mtimes = {}
+		_slugs_to_mtimes = {}
 		for _, doc in ipairs(data) do
-			slugs_to_mtimes[doc.slug] = doc.mtime
+			_slugs_to_mtimes[doc.slug] = doc.mtime
 		end
-		callback(slugs_to_mtimes)
+		callback()
 	end))
 end
 
 local function install_with_telescope()
-	fetch_slugs_and_then(function(slugs_to_mtimes)
+	fetch_slugs_and_then(function()
 		local docs = {}
-		for slug, _ in pairs(slugs_to_mtimes) do
+		for slug, _ in pairs(_slugs_to_mtimes) do
 			table.insert(docs, slug)
 		end
 		table.sort(docs)
@@ -217,7 +219,7 @@ local function install_with_telescope()
 				actions.select_default:replace(function()
 					local selection = require("telescope.actions.state").get_selected_entry()
 					actions.close(prompt_bufnr)
-					require("apidocs.install").apidoc_install(selection.value, slugs_to_mtimes)
+					require("apidocs.install").apidoc_install(selection.value, _slugs_to_mtimes)
 				end)
 				return true
 			end
