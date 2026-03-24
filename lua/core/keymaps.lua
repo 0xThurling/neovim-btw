@@ -75,12 +75,13 @@ vim.keymap.set("n", "<C-s>", ":wa<CR>", {
 	desc = "Save all buffers", -- Optional: adds a description for :h keymap
 })
 
-vim.keymap.set("n", "<esc><esc>", ":noh<CR>", { noremap = true, silent = true, desc = "Clear search highlighting" })
+vim.keymap.set("n", "<C-l>", ":noh<CR>", { noremap = true, silent = true, desc = "Clear search highlighting" })
 
 -- Open dadbod
 vim.keymap.set("n", "<leader>d", ":DBUI<CR>", { desc = "Open Dadbod" })
 
-vim.keymap.set('t', '<esc>', "<C-\\><C-n>", { desc = 'Exit Terminal Mode' })
+vim.keymap.set('t', '<C-q>', "<C-\\><C-n>", { desc = 'Exit Terminal Mode' })
+vim.keymap.set('t', '<C-\\><C-n>', "<C-\\><C-n>", { desc = 'Exit Terminal Mode' })
 
 vim.keymap.set("i", "<M-Backspace>", "<C-o>db")
 
