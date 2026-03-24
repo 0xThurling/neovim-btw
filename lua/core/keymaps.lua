@@ -94,6 +94,19 @@ end, { desc = 'Show diagnostics in a floating window' })
 
 vim.keymap.set("n", "<leader>rs", function() vim.cmd("LspRestart roslyn") end, { desc = "Restart Roslyn LSP Server" })
 
+-- Lazygit
+vim.keymap.set("n", "<leader>gg", function()
+	vim.cmd("botright terminal lazygit")
+end, { desc = "Open Lazygit" })
+
+vim.keymap.set("n", "<leader>gf", function()
+	vim.cmd("botright terminal lazygit filter")
+end, { desc = "Lazygit Filter" })
+
+vim.keymap.set("n", "<leader>gF", function()
+	vim.cmd("botright terminal lazygit filter --current-file")
+end, { desc = "Lazygit Filter Current File" })
+
 -- Devdocs
 vim.keymap.set("n", "<leader>io", "<cmd>DevdocsOpenFloat<cr>", { desc = "Open Devdocs" })
 

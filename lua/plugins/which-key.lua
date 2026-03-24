@@ -8,8 +8,11 @@ return {
 	},
 	config = function()
     wk.add({
-      { "<leader>g", group = "Go To", desc = "Go To" },
-      { "<leader>gd", desc = "Definition" },
+      { "<leader>g", group = "Git", desc = "Git" },
+      { "<leader>gg", desc = "Open Lazygit" },
+      { "<leader>gf", desc = "Lazygit Filter" },
+      { "<leader>gF", desc = "Lazygit Filter Current File" },
+      { "<leader>gd", desc = "Go To Definition" },
       { "<leader>gr", desc = "References" },
       { "<leader>gi", desc = "Implementation" },
       { "<leader>r", group = "Rename", desc = "Rename" },
