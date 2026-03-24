@@ -227,8 +227,131 @@ local function install_with_telescope()
 	end)
 end
 
-vim.keymap.set("n", "<leader>ig", open_glow_doc, { desc = "Open API doc with glow" })
+local function show_doc_picker(matches, word)
+	if #matches == 0 then
+		vim.notify("No docs found for: " .. word, vim.log.levels.WARN)
+		return
+	end
+	
+	table.sort(matches)
+	
+	local pickers = require("telescope.pickers")
+	local finders = require("telescope.finders")
+	local actions = require("telescope.actions")
+	local conf = require("telescope.config").values
+	
+	pickers.new({}, {
+		prompt_title = "Docs for: " .. word,
+		finder = finders.new_table({
+			results = matches,
+			entry_maker = function(entry)
+				local display = vim.fn.fnamemodify(entry, ":t"):match("^[^#]+") or vim.fn.fnamemodify(entry, ":t")
+				return { value = entry, display = display, ordinal = display }
+			end
+		}),
+		sorter = conf.file_sorter(),
+		attach_mappings = function(prompt_bufnr)
+			actions.select_default:replace(function()
+				local selection = require("telescope.actions.state").get_selected_entry()
+				actions.close(prompt_bufnr)
+				open_terminal_float("glow -w 0 " .. vim.fn.shellescape(selection.value))
+			end)
+			return true
+		end
+	}):find()
+end
+
+-- Show API docs for word under cursor (search filename only)
+vim.keymap.set("n", "<leader>ig", function()
+	local word = vim.fn.expand("<cword>")
+	if word == "" then
+		vim.notify("No word under cursor", vim.log.levels.WARN)
+		return
+	end
+	
+	local data_dir = vim.fn.stdpath("data") .. "/apidocs-data/"
+	
+	local handle = io.popen("find " .. data_dir .. " -type f -name '*" .. word .. "*' 2>/dev/null")
+	if not handle then
+		vim.notify("Search failed", vim.log.levels.ERROR)
+		return
+	end
+	
+	local file_matches = {}
+	for line in handle:lines() do
+		if line ~= "" and line:match("%.md$") then
+			table.insert(file_matches, line)
+		end
+	end
+	handle:close()
+	
+	if #file_matches == 0 then
+		vim.notify("No docs found for: " .. word, vim.log.levels.WARN)
+		return
+	end
+	
+	show_doc_picker(file_matches, word)
+end, { desc = "Show API docs for word under cursor" })
 vim.keymap.set("n", "<leader>ii", install_with_telescope, { desc = "Install API docs" })
+
+-- Glow for any markdown file with telescope
+vim.keymap.set("n", "<leader>om", function()
+	local pickers = require("telescope.pickers")
+	local finders = require("telescope.finders")
+	local actions = require("telescope.actions")
+	local conf = require("telescope.config").values
+	
+	local files = {}
+	local handle = io.popen("find . -type f -name '*.md' -not -path './node_modules/*' -not -path './.git/*' 2>/dev/null")
+	if handle then
+		for line in handle:lines() do
+			table.insert(files, line)
+		end
+		handle:close()
+	end
+	table.sort(files)
+	
+	if #files == 0 then
+		vim.notify("No markdown files found", vim.log.levels.WARN)
+		return
+	end
+	
+	pickers.new({}, {
+		prompt_title = "Find Markdown Files",
+		finder = finders.new_table({
+			results = files,
+			entry_maker = function(entry)
+				return { value = entry, display = entry, ordinal = entry }
+			end
+		}),
+		sorter = conf.file_sorter(),
+		attach_mappings = function(prompt_bufnr)
+			actions.select_default:replace(function()
+				local selection = require("telescope.actions.state").get_selected_entry()
+				actions.close(prompt_bufnr)
+				
+				local out = vim.fn.system("glow -w 0 " .. vim.fn.shellescape(selection.value))
+				if vim.v.shell_error ~= 0 then
+					vim.notify("Glow error: " .. out, vim.log.levels.ERROR)
+					return
+				end
+				
+				vim.cmd("vsplit")
+				local buf = vim.api.nvim_create_buf(false, true)
+				vim.api.nvim_set_current_buf(buf)
+				vim.fn.termopen("glow -w 0 " .. vim.fn.shellescape(selection.value))
+				vim.cmd("startinsert")
+			end)
+			return true
+		end,
+	}):find()
+end, { desc = "Open markdown with glow" })
+
+-- Browse all API docs
+vim.keymap.set("n", "<leader>iG", function()
+	open_glow_doc()
+end, { desc = "Browse API docs" })
+
 vim.keymap.set("n", "<leader>is", "<cmd>ApidocsSearch<cr>", { desc = "Search API docs" })
 
 
