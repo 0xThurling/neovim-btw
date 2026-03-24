@@ -76,6 +76,7 @@ vim.keymap.set("n", "<C-s>", ":wa<CR>", {
 })
 
 vim.keymap.set("n", "<C-l>", ":noh<CR>", { noremap = true, silent = true, desc = "Clear search highlighting" })
+vim.keymap.set("n", "<esc><esc>", ":noh<CR>", { noremap = true, silent = true, desc = "Clear search highlighting" })
 
 -- Open dadbod
 vim.keymap.set("n", "<leader>d", ":DBUI<CR>", { desc = "Open Dadbod" })
