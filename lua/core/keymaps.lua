@@ -109,8 +109,10 @@ vim.keymap.set("n", "<leader>gF", function()
 	vim.cmd("botright terminal lazygit filter --current-file")
 end, { desc = "Lazygit Filter Current File" })
 
--- Devdocs
-vim.keymap.set("n", "<leader>io", "<cmd>DevdocsOpenFloat<cr>", { desc = "Open Devdocs" })
+-- Devdocs (API docs)
+vim.keymap.set("n", "<leader>io", "<cmd>ApidocsSearch<cr>", { desc = "Search API docs" })
+vim.keymap.set("n", "<leader>ii", "<cmd>ApidocsInstall<cr>", { desc = "Install API docs" })
+vim.keymap.set("n", "<leader>iS", "<cmd>ApidocsOpen<cr>", { desc = "Open API docs" })
 
 -- Code actions (fallback if no LSP attached)
 vim.keymap.set("n", "<leader>ca", function()
