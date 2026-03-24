@@ -261,7 +261,7 @@ local function show_doc_picker(matches, word)
 	}):find()
 end
 
--- Show API docs for word under cursor (search filename only)
+-- Show API docs for word under cursor (search filename only in apidocs)
 vim.keymap.set("n", "<leader>ig", function()
 	local word = vim.fn.expand("<cword>")
 	if word == "" then
@@ -271,7 +271,7 @@ vim.keymap.set("n", "<leader>ig", function()
 	
 	local data_dir = vim.fn.stdpath("data") .. "/apidocs-data/"
 	
-	local handle = io.popen("find " .. data_dir .. " -type f -name '*" .. word .. "*' 2>/dev/null")
+	local handle = io.popen("find " .. data_dir .. " -type f \\( -name '*" .. word .. "*.md' -o -name '*" .. word .. "*.html.md' \\) 2>/dev/null")
 	if not handle then
 		vim.notify("Search failed", vim.log.levels.ERROR)
 		return
@@ -279,7 +279,7 @@ vim.keymap.set("n", "<leader>ig", function()
 	
 	local file_matches = {}
 	for line in handle:lines() do
-		if line ~= "" and line:match("%.md$") then
+		if line ~= "" then
 			table.insert(file_matches, line)
 		end
 	end
