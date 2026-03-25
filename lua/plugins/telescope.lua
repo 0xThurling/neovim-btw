@@ -28,7 +28,13 @@ return {
 					hidden = true,
 				},
 				live_grep = {
-					theme = "dropdown",
+					theme = "cursor",
+					layout_strategy = "horizontal",
+					layout_config = {
+						width = 0.9,
+						height = 0.8,
+						preview_width = 0.6,
+					},
 				},
 				buffers = {
 					theme = "dropdown",

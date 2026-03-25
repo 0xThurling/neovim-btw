@@ -353,6 +353,7 @@ vim.keymap.set("n", "<leader>iG", function()
 end, { desc = "Browse API docs" })
 
 vim.keymap.set("n", "<leader>is", "<cmd>ApidocsSearch<cr>", { desc = "Search API docs" })
+vim.keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
 
 
 
