@@ -1,4 +1,0 @@
-# Test
-```lua
-print("hello")
-```

@@ -1,6 +1,10 @@
 vim.o.paste = false
 vim.opt.clipboard:prepend({ unnamed = true })
 
+-- Disable built-in treesitter to avoid conflict with nvim-treesitter plugin
+-- vim.g.loaded_treesitter = true
+-- vim.g.loaded_treesitter_query = true
+
 vim.api.nvim_create_autocmd("ModeChanged", {
 	pattern = "*:*",
 	callback = function(args)
