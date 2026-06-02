@@ -7,7 +7,6 @@ return {
 
 		-- REQUIRED
 		harpoon:setup()
-		-- REQUIRED
 
 		local conf = require("telescope.config").values
 		local function toggle_telescope(harpoon_files)
@@ -33,7 +32,7 @@ return {
 		end, {desc = "Add file to harpoon"})
 		vim.keymap.set("n", "<Tab>d", function()
 			harpoon:list():remove()
-		end, {desc = "Add file to harpoon"})
+		end, {desc = "Remove file from harpoon"})
 		vim.keymap.set("n", "<leader>hm", function()
 			harpoon.ui:toggle_quick_menu(harpoon:list())
 		end, { desc = "Open harpoon menu" })
@@ -57,30 +56,10 @@ return {
 		end, { desc = "Open previous file" })
 		vim.keymap.set("n", "<Tab>m", function()
 			harpoon:list():next()
-    end, { desc = "Open next file" })
-
-		-- basic telescope configuration
-		local conf = require("telescope.config").values
-		local function toggle_telescope(harpoon_files)
-			local file_paths = {}
-			for _, item in ipairs(harpoon_files.items) do
-				table.insert(file_paths, item.value)
-			end
-
-			require("telescope.pickers")
-				.new({}, {
-					prompt_title = "Harpoon",
-					finder = require("telescope.finders").new_table({
-						results = file_paths,
-					}),
-					previewer = conf.file_previewer({}),
-					sorter = conf.generic_sorter({}),
-				})
-				:find()
-		end
+		end, { desc = "Open next file" })
 
 		-- Telescope integration
-		vim.keymap.set("n", "<leader>hm", function()
+		vim.keymap.set("n", "<leader>ht", function()
 			toggle_telescope(harpoon:list())
 		end, { desc = "Open harpoon window" })
 	end,

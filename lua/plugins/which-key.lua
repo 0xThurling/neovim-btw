@@ -1,5 +1,3 @@
-local wk = require("which-key")
-
 return {
 	"folke/which-key.nvim",
 	event = "VeryLazy",
@@ -7,6 +5,7 @@ return {
 		-- your default settings here
 	},
 	config = function()
+		local wk = require("which-key")
 		wk.add({
 			{ "<leader>c", group = "Code", desc = "Code" },
 			{ "<leader>cf", desc = "Format file or range" },
@@ -37,6 +36,8 @@ return {
 			{ "<leader>iG", desc = "Browse API docs" },
 			{ "<leader>ii", desc = "Install API docs" },
 			{ "<leader>is", desc = "Search API docs" },
+			{ "<leader>ip", desc = "Pendulum time tracking metrics" },
+			{ "<leader>ih", desc = "Pendulum active hours metrics" },
 			{ "<leader>o", group = "Open", desc = "Open" },
 			{ "<leader>om", desc = "Open markdown with glow" },
 			{ "<leader>r", group = "Rename", desc = "Rename" },

@@ -5,10 +5,6 @@ return {
 		lazy = true,
 	},
 	{
-
-		"tris203/rzls.nvim",
-	},
-	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
@@ -25,15 +21,6 @@ return {
 			vim.g.mkdp_filetypes = { "markdown" }
 		end,
 		ft = { "markdown" },
-	},
-	{
-		"folke/which-key.nvim",
-		event = "VeryLazy",
-		opts = {
-			-- your configuration comes here
-			-- or leave it empty to use the default settings
-			-- refer to the configuration section below
-		},
 	},
 	{
 		"stevearc/conform.nvim",
@@ -80,16 +67,5 @@ return {
 				},
 			})
 		end,
-	},
-	{
-		"nvim-telescope/telescope.nvim",
-		tag = "0.1.8",
-		dependencies = { "nvim-lua/plenary.nvim" },
-	},
-	{
-		"folke/tokyonight.nvim",
-		lazy = false,
-		priority = 1000,
-		opts = {},
 	},
 }
