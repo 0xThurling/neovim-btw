@@ -48,18 +48,19 @@ return {
 
 			local _ = require("mason-registry")
 
-			local rzls_path = vim.fn.expand("$MASON/packages/rzls/libexec")
-			local cmd = {
-				"roslyn",
-				"--stdio",
-				"--logLevel=Information",
-				"--extensionLogDirectory=" .. vim.fs.dirname(vim.lsp.get_log_path()),
-				"--razorSourceGenerator=" .. vim.fs.joinpath(rzls_path, "Microsoft.CodeAnalysis.Razor.Compiler.dll"),
-				"--razorDesignTimePath="
-					.. vim.fs.joinpath(rzls_path, "Targets", "Microsoft.NET.Sdk.Razor.DesignTime.targets"),
-				"--extension",
-				vim.fs.joinpath(rzls_path, "RazorExtension", "Microsoft.VisualStudioCode.RazorExtension.dll"),
-			}
+		local roslyn_nightly_path = vim.fn.expand("$MASON/packages/roslyn-nightly/libexec")
+		local cmd = {
+			"dotnet",
+			vim.fs.joinpath(roslyn_nightly_path, "Microsoft.CodeAnalysis.LanguageServer.dll"),
+			"--stdio",
+			"--logLevel=Information",
+			"--extensionLogDirectory=" .. vim.fs.dirname(vim.lsp.get_log_path()),
+			"--razorSourceGenerator=" .. vim.fs.joinpath(roslyn_nightly_path, "Microsoft.CodeAnalysis.Razor.Compiler.dll"),
+			"--razorDesignTimePath="
+				.. vim.fs.joinpath(roslyn_nightly_path, "Targets", "Microsoft.NET.Sdk.Razor.DesignTime.targets"),
+			"--extension",
+			vim.fs.joinpath(roslyn_nightly_path, "RazorExtension", "Microsoft.VisualStudioCode.RazorExtension.dll"),
+		}
 
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			vim.lsp.config("roslyn", {

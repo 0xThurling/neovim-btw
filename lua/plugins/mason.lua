@@ -7,7 +7,7 @@ return {
       require("mason").setup({
         registries = {
           "github:mason-org/mason-registry",
-          "github:Crashdummyy/mason-registry", -- Add custom registry
+          "github:Crashdummyy/mason-registry",
         },
         ensure_installed = {
           "csharpier", -- for formatting
@@ -17,6 +17,14 @@ return {
   },
   {
     "mason-org/mason-lspconfig.nvim",
-    branch = "v1.x"
+    branch = "v1.x",
+    config = function()
+      require("mason-lspconfig").setup({
+        ensure_installed = {
+          "csharpier", -- for formatting
+          "roslyn-nightly",
+        },
+      })
+    end,
   },
 }
