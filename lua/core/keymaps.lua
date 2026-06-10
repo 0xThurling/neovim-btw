@@ -1,8 +1,24 @@
 local function open_floating_terminal()
+ 	local width = math.floor(vim.o.columns * 0.9)
+ 	local height = math.floor(vim.o.lines * 0.9)
+ 	local buf = vim.api.nvim_create_buf(false, true)
+ 	local win = vim.api.nvim_open_win(buf, true, {
+ 		relative = "editor",
+ 		width = width,
+ 		height = height,
+ 		col = math.floor((vim.o.columns - width) / 2),
+ 		row = math.floor((vim.o.lines - height) / 2),
+ 		border = "rounded",
+ 	})
+ 	vim.fn.termopen(vim.o.shell)
+ 	vim.cmd("startinsert")
+ end
+
+local function open_floating_asm(asm_file)
 	local width = math.floor(vim.o.columns * 0.9)
 	local height = math.floor(vim.o.lines * 0.9)
 	local buf = vim.api.nvim_create_buf(false, true)
-	local win = vim.api.nvim_open_win(buf, true, {
+	vim.api.nvim_open_win(buf, true, {
 		relative = "editor",
 		width = width,
 		height = height,
@@ -10,45 +26,119 @@ local function open_floating_terminal()
 		row = math.floor((vim.o.lines - height) / 2),
 		border = "rounded",
 	})
-	vim.fn.termopen(vim.o.shell)
-	vim.cmd("startinsert")
+	vim.api.nvim_set_current_buf(buf)
+	vim.api.nvim_buf_set_name(buf, asm_file)
+	local f = io.open(asm_file, "r")
+	if f then
+		local content = f:read("*all")
+		f:close()
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(content, "\n", { plain = true, trimquotes = false }))
+	end
+	vim.bo.buftype = ""
+	vim.bo.buflisted = false
+	vim.bo.bufhidden = "wipe"
+	vim.bo.filetype = "asm"
 end
 
-	local conan2_includes = (function()
-		local dirs = vim.fn.glob("/root/.conan2/p/*/p/include", 1, 1)
-		local paths = {}
-		if type(dirs) == "table" then
-			for _, dir in ipairs(dirs) do
-				table.insert(paths, "-I" .. dir)
-			end
+local function find_compile_commands()
+	local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+	while dir ~= "/" do
+		local path = vim.fs.joinpath(dir, "compile_commands.json")
+		if vim.fn.filereadable(path) == 1 then
+			return path, vim.fs.dirname(path)
 		end
-		return table.concat(paths, " ")
-	end)()
+		dir = vim.fs.dirname(dir)
+	end
+	return nil, nil
+end
+
+local function get_flags_from_compile_commands(file_path)
+ 	local compile_commands_path, _ = find_compile_commands()
+ 	if not compile_commands_path then
+ 		return nil
+ 	end
+ 	local f = io.open(compile_commands_path, "r")
+ 	if not f then
+ 		return nil
+ 	end
+ 	local content = f:read("*all")
+ 	f:close()
+ 	local ok, compile_commands = pcall(vim.fn.json_decode, content)
+ 	if not ok then
+ 		return nil
+ 	end
+ 	for _, entry in ipairs(compile_commands) do
+ 		if entry.file and vim.fn.fnamemodify(entry.file, ":p") == file_path then
+ 			local command = entry.command
+ 			local escaped_file = vim.fn.shellescape(file_path)
+ 			command = command:gsub("^(%S+%s+)", "")
+ 			command = command:gsub(escaped_file, "")
+ 			command = command:gsub("%s%-o%s+%S+", "")
+ 			command = command:gsub("%s+", " "):match("^%s*(.*)"):match("(%S.*)") or ""
+ 			return command
+ 		end
+ 	end
+ 	return nil
+ end
 
 local function compile_cpp()
-	local ft = vim.bo.filetype
-	local is_c = ft == "c"
-	local compiler = is_c and "gcc" or "g++"
-	local flags = vim.fn.input("Flags: ", "-std=c++20 " .. conan2_includes)
-	local file = vim.api.nvim_buf_get_name(0)
-	local cmd = string.format("%s %s %s -o /tmp/godotbin", compiler, file, flags)
-	vim.notify("Compiling: " .. cmd, vim.log.levels.INFO)
-	open_terminal_float(cmd)
-end
+ 	local ft = vim.bo.filetype
+ 	local is_c = ft == "c"
+ 	local compiler = is_c and "gcc" or "g++"
+ 	local file = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+ 	local file_flags = get_flags_from_compile_commands(file)
+ 	if not file_flags then
+ 		file_flags = ""
+ 	end
+ 	local cmd = string.format("%s %s %s -o /tmp/godotbin", compiler, vim.fn.shellescape(file), file_flags)
+ 	vim.notify("Compiling...", vim.log.levels.INFO)
+ 	open_terminal_float(cmd)
+ end
+
+local function compile_asm_cpp()
+ 	local ft = vim.bo.filetype
+ 	local is_c = ft == "c"
+ 	local compiler = is_c and "gcc" or "g++"
+ 	local file = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+ 	local file_flags = get_flags_from_compile_commands(file)
+ 	if not file_flags then
+ 		file_flags = "-O2"
+ 	end
+ 	local asm_file = "/tmp/godotasm.s"
+ 	local cmd = string.format("%s %s %s -S -o %s", compiler, vim.fn.shellescape(file), file_flags, asm_file)
+ 	vim.notify("Compiling to assembly...", vim.log.levels.INFO)
+ 	vim.system({ "sh", "-c", cmd }, {}, vim.schedule_wrap(function(result)
+ 		if result.code == 0 then
+ 			open_floating_asm(asm_file)
+ 		else
+ 			vim.notify("Assembly compilation failed: " .. (result.stderr or ""), vim.log.levels.ERROR)
+ 		end
+ 	end))
+ end
 
 local function compile_run_cpp()
-	local ft = vim.bo.filetype
-	local is_c = ft == "c"
-	local compiler = is_c and "gcc" or "g++"
-	local flags = vim.fn.input("Flags: ", "-std=c++20 " .. conan2_includes)
-	local file = vim.api.nvim_buf_get_name(0)
-	local cmd = string.format("%s %s %s -o /tmp/godotbin && /tmp/godotbin", compiler, file, flags)
-	vim.notify("Compiling & Running: " .. cmd, vim.log.levels.INFO)
-	open_terminal_float(cmd)
-end
+ 	local ft = vim.bo.filetype
+ 	local is_c = ft == "c"
+ 	local compiler = is_c and "gcc" or "g++"
+ 	local file = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+ 	local file_flags = get_flags_from_compile_commands(file)
+ 	if not file_flags then
+ 		file_flags = ""
+ 	end
+ 	local cmd = string.format("%s %s %s -o /tmp/godotbin && /tmp/godotbin", compiler, vim.fn.shellescape(file), file_flags)
+ 	vim.notify("Compiling & running...", vim.log.levels.INFO)
+ 	open_terminal_float(cmd)
+ end
+
+vim.api.nvim_create_user_command("Godbolt", function(opts)
+	require("core.godbolt_local").run_local_godbolt(opts)
+end, { range = true, desc = "Generate assembly locally with Godbolt-like filtering" })
 
 vim.keymap.set("n", "<leader>cc", compile_cpp, { noremap = true, silent = true, desc = "Compile C/C++ locally" })
+vim.keymap.set({ "n", "v" }, "<leader>cA", ":Godbolt<CR>", { noremap = true, silent = true, desc = "Compile C/C++ to assembly (Local Godbolt)" })
+vim.keymap.set({ "n", "v" }, "<leader>gb", ":Godbolt<CR>", { noremap = true, silent = true, desc = "Run local Godbolt" })
 vim.keymap.set("n", "<leader>cr", compile_run_cpp, { noremap = true, silent = true, desc = "Compile & run C/C++ locally" })
+
 
 vim.keymap.set({ "n", "v" }, "<leader>cf", function()
 	require("conform").format({
