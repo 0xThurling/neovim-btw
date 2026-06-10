@@ -20,8 +20,8 @@ return {
 				},
 				-- `highlight = false` to disable highlights
 				quickfix = {
-					enable = false, -- whether to populate the quickfix list in case of errors
-					auto_open = false, -- whether to open the quickfix list in case of errors
+					enable = true, -- whether to populate the quickfix list in case of errors
+					auto_open = true, -- whether to open the quickfix list in case of errors
 				},
 				url = "https://godbolt.org", -- can be changed to a different godbolt instance
 			})

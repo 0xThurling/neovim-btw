@@ -14,6 +14,42 @@ local function open_floating_terminal()
 	vim.cmd("startinsert")
 end
 
+	local conan2_includes = (function()
+		local dirs = vim.fn.glob("/root/.conan2/p/*/p/include", 1, 1)
+		local paths = {}
+		if type(dirs) == "table" then
+			for _, dir in ipairs(dirs) do
+				table.insert(paths, "-I" .. dir)
+			end
+		end
+		return table.concat(paths, " ")
+	end)()
+
+local function compile_cpp()
+	local ft = vim.bo.filetype
+	local is_c = ft == "c"
+	local compiler = is_c and "gcc" or "g++"
+	local flags = vim.fn.input("Flags: ", "-std=c++20 " .. conan2_includes)
+	local file = vim.api.nvim_buf_get_name(0)
+	local cmd = string.format("%s %s %s -o /tmp/godotbin", compiler, file, flags)
+	vim.notify("Compiling: " .. cmd, vim.log.levels.INFO)
+	open_terminal_float(cmd)
+end
+
+local function compile_run_cpp()
+	local ft = vim.bo.filetype
+	local is_c = ft == "c"
+	local compiler = is_c and "gcc" or "g++"
+	local flags = vim.fn.input("Flags: ", "-std=c++20 " .. conan2_includes)
+	local file = vim.api.nvim_buf_get_name(0)
+	local cmd = string.format("%s %s %s -o /tmp/godotbin && /tmp/godotbin", compiler, file, flags)
+	vim.notify("Compiling & Running: " .. cmd, vim.log.levels.INFO)
+	open_terminal_float(cmd)
+end
+
+vim.keymap.set("n", "<leader>cc", compile_cpp, { noremap = true, silent = true, desc = "Compile C/C++ locally" })
+vim.keymap.set("n", "<leader>cr", compile_run_cpp, { noremap = true, silent = true, desc = "Compile & run C/C++ locally" })
+
 vim.keymap.set({ "n", "v" }, "<leader>cf", function()
 	require("conform").format({
 		lsp_fallback = true,
