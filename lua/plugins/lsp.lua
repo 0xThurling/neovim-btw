@@ -86,6 +86,15 @@ return {
 			vim.lsp.config('clangd', {
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
+				cmd = {
+					"clangd",
+					"--background-index",           -- index entire project in background
+					"--clang-tidy",                 -- enable clang-tidy linting
+					"--header-insertion=iwyu",      -- include-what-you-use style includes
+					"--completion-style=detailed",  -- richer completions
+					"--function-arg-placeholders",  -- fill in argument names in completions
+					"--fallback-style=llvm",        -- LLVM style as default
+				},
 			})
 
 			vim.lsp.config('pyright', {
@@ -114,6 +123,13 @@ return {
       vim.lsp.enable('ts_ls')
       vim.lsp.enable('html')
       vim.lsp.enable('pyright')
+
+			-- asm_lsp: installed via mason, enable for assembly files
+			vim.lsp.config('asm_lsp', {
+				capabilities = capabilities,
+				on_attach = lsp_utils.on_attach,
+			})
+      vim.lsp.enable('asm_lsp')
 
 			--
 			--

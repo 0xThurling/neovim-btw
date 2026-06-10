@@ -493,3 +493,4 @@ vim.keymap.set("n", "<leader>ca", function()
   vim.lsp.buf.code_action()
 end, { desc = "Code Actions" })
 
+return { get_flags_from_compile_commands = get_flags_from_compile_commands }

@@ -3,6 +3,11 @@ local M = {}
 M.on_attach = function(client, bufnr)
 	local opts = { noremap = true, silent = true, buffer = bufnr }
 
+	-- Enable inlay hints if supported (Neovim 0.10+, clangd, rust-analyzer, etc.)
+	if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+		vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+	end
+
 	-- Go to definition
 	vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
 

@@ -15,29 +15,7 @@ return {
 			local dap = require("dap")
 			local mason_nvim_dap = require("mason-nvim-dap")
 
-			mason_nvim_dap.setup({
-				ensure_installed = { "codelldb", "rdbg", "netcoredbg" },
-				handlers = {},
-			})
-
-			-- C# DAP configuration
-			dap.adapters.coreclr = {
-				type = "executable",
-				command = vim.fn.exepath("netcoredbg"),
-				args = { "--interpreter=vscode" },
-			}
-
-			dap.configurations.cs = {
-				{
-					type = "coreclr",
-					name = "Launch",
-					request = "launch",
-					program = function()
-						return vim.fn.input("Path to dll or exe: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
-					end,
-				},
-			}
-
+			require('debug_cpp').setup(dap)
 			-- Ruby DAP configuration
 			dap.adapters.rdbg = {
 				type = "executable",
@@ -115,47 +93,43 @@ return {
 			local keymap_opts = { noremap = true, silent = true }
 			vim.keymap.set(
 				"n",
-				"<leader>pc",
+				"<leader>qc",
 				dap.continue,
 				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Continue" })
 			)
 			vim.keymap.set(
 				"n",
-				"<leader>so",
+				"<leader>qo",
 				dap.step_over,
 				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Step Over" })
 			)
 			vim.keymap.set(
 				"n",
-				"<leader>si",
+				"<leader>qi",
 				dap.step_into,
 				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Step Into" })
 			)
 			vim.keymap.set(
 				"n",
-				"<leader>sO",
+				"<leader>qO",
 				dap.step_out,
 				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Step Out" })
 			)
 			vim.keymap.set(
 				"n",
-				"<leader>pb",
+				"<leader>qb",
 				dap.toggle_breakpoint,
 				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Toggle Breakpoint" })
 			)
 			vim.keymap.set(
 				"n",
-				"<leader>pr",
+				"<leader>qr",
 				dap.repl.toggle,
 				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Toggle REPL" })
 			)
-			vim.keymap.set(
-				"n",
-				"<leader>pu",
-				dapui.toggle,
-				vim.tbl_extend("force", keymap_opts, { desc = "Debug: Toggle DAP UI" })
-			)
+
+			vim.keymap.set("n", "<leader>qu", dapui.toggle,
+      vim.tbl_extend("force", keymap_opts, { desc = "Debug: Toggle DAP UI" }))
 		end,
 	},
 }
-
