@@ -24,14 +24,14 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
+    event = {"BufReadPre", "BufNewFile"},
 		config = function()
+			-- Configure hover float border without overriding syntax
+			-- (forcing markdown syntax on all floats causes treesitter nil-node crashes)
 			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
 			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 				opts = opts or {}
 				opts.border = opts.border or "rounded"
-				if syntax == "" or syntax == nil then
-					syntax = "markdown"
-				end
 				return orig_util_open_floating_preview(contents, syntax, opts, ...)
 			end
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -46,7 +46,6 @@ return {
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"gopls",
-					"html",
 					"clangd",
 					"pyright",
 					"sqlls",
@@ -106,11 +105,6 @@ return {
 				capabilities = capabilities,
 				on_attach = lsp_utils.on_attach,
 			})
-
-      vim.lsp.config('html', {
-        capabilities = capabilities,
-        on_attach = lsp_utils.on_attach,
-      })
 
       vim.lsp.config('emmet_ls', {
         capabilities = capabilities,
@@ -208,7 +202,13 @@ return {
 				severity_sort = true,
 			})
 
-			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
+			-- Wrap hover in pcall so treesitter rendering errors don't break the UI
+			vim.keymap.set("n", "K", function()
+				local ok, err = pcall(vim.lsp.buf.hover)
+				if not ok then
+					vim.notify("LSP hover error: " .. tostring(err), vim.log.levels.WARN)
+				end
+			end, { desc = "Show hover information" })
 		end,
 	},
 }
